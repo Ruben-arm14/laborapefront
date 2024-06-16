@@ -1,0 +1,30 @@
+{
+  "distrito": [
+    {
+      "id": 1,
+      "nombre": "Lince"
+    },
+    {
+      "id": 2,
+      "nombre": "San borja"
+    },
+    {
+      "id": 3,
+      "nombre": "San Isidro"
+    }
+  ],
+  "categorias": [
+    {
+      "id": 1,
+      "nombre": "Plomería"
+    },
+    {
+      "id": 2,
+      "nombre": "Albañileria"
+    },
+    {
+      "id": 3,
+      "nombre": "Limpieza"
+    }
+  ]
+}

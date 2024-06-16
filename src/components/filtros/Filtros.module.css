@@ -1,0 +1,35 @@
+.filtros-container {
+    float: left; /* Para alinear a la izquierda */
+    width: 250px; /* Ancho del contenedor */
+    margin-right: 20px; /* Espacio a la derecha para separarlo del contenido principal */
+    padding: 20px; /* Espaciado interno */
+    border: 1px solid #ccc; /* Borde del contenedor */
+    border-radius: 5px; /* Bordes redondeados */
+    background-color: #f9f9f9; /* Color de fondo */
+  } 
+  /* Estilos para el título de los filtros */
+  .filtros-title {
+    margin-bottom: 10px; /* Espacio inferior */
+    font-size: 18px; /* Tamaño de fuente */
+    font-weight: bold; /* Negrita */
+  }
+  
+  /* Estilos para las etiquetas de los filtros */
+  .filtros-label {
+    margin-bottom: 5px; /* Espacio inferior */
+    font-size: 16px; /* Tamaño de fuente */
+  }
+  
+  /* Estilos para los selectores de los filtros */
+  .filtros-select {
+    width: 100%; /* Ancho completo */
+    padding: 5px; /* Espaciado interno */
+    border: 1px solid #ddd; /* Borde del selector */
+    border-radius: 3px; /* Bordes redondeados */
+    background-color: #fff; /* Color de fondo */
+  }
+  
+  /* Estilos para las opciones del selector */
+  .filtros-option {
+    font-size: 14px; /* Tamaño de fuente */
+  }

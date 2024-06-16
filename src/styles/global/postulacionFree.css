@@ -1,0 +1,53 @@
+.megaConte {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.subMegaConte {
+  width: 100%;
+  max-width: 1200px;
+  padding: 20px;
+}
+
+.contenedor {
+  display: flex;
+  justify-content: space-between;
+}
+
+.child1 {
+  flex: 1;
+}
+
+.child2 {
+  display: flex;
+  justify-content: flex-end;
+  gap: 20px;
+}
+
+.links {
+  color: blue;
+  text-decoration: none;
+}
+
+.version {
+  color: grey;
+}
+
+.subMegaConte2 {
+  margin-top: 20px;
+}
+
+.subSubTitulo {
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.miniTrabajos {
+  margin-top: 10px;
+}
+
+.subSubTexto {
+  color: grey;
+  font-style: italic;
+}
