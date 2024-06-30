@@ -2,6 +2,7 @@ import { useState, useContext } from "react";
 import { useRouter } from "next/router";
 import { AppContext } from "@/context/AppContext";
 import Link from "next/link";
+import styles from "@/styles/global/login.module.css";
 
 const LoginForm = () => {
   const router = useRouter();
@@ -23,56 +24,56 @@ const LoginForm = () => {
       const response = await fetch("http://localhost:8080/usuarios/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({
+          correo: formData.correo,
+          contrasena: formData.contrasenia
+        }),
       });
 
       if (response.ok) {
         const userData = await response.json();
         setUser(userData);
         localStorage.setItem('usuario', JSON.stringify(userData));
-
-        // Redireccionar según el rol del usuario
-        router.push(userData.rol === 'CLIENTE' ? '/visualizacionPropuestas' : '/propuestas'); 
+        router.push(userData.rol === 'CLIENTE' ? '/visualizacionPropuestas' : '/trabajosFreelancer');
       } else {
-        const errorData = await response.json(); 
-        setError(errorData.error || "Credenciales incorrectas"); 
+        const errorData = await response.json();
+        setError(errorData.error || "Credenciales incorrectas");
       }
     } catch (error) {
       setError("Error en el servidor. Inténtalo de nuevo más tarde.");
       console.error(error);
     } finally {
-      setIsLoading(false); 
+      setIsLoading(false);
     }
   };
 
   return (
-    <div className="container">
-      <div className="form_area">
-        <p className="title">LaboraPE</p>
+    <div className={styles.container}>
+      <div className={styles.form_area}>
+        <img src="/imagenes/Labora.png" alt="LaboraPE Logo" className={styles.logo} />
         <form onSubmit={handleSubmit}>
-          {/* Campos del formulario */}
-          <div className="form_group">
-            <label className="sub_title" htmlFor="correo">
+          <div className={styles.form_group}>
+            <label className={styles.sub_title} htmlFor="correo">
               Email
             </label>
             <input
               placeholder="Ingrese su email"
               id="correo"
-              className="form_style"
+              className={styles.form_style}
               type="email"
               value={formData.correo}
               onChange={handleChange}
               required
             />
           </div>
-          <div className="form_group">
-            <label className="sub_title" htmlFor="contrasenia">
+          <div className={styles.form_group}>
+            <label className={styles.sub_title} htmlFor="contrasenia">
               Contraseña
             </label>
             <input
               placeholder="Ingrese su contraseña"
-              id="contrasenia" 
-              className="form_style"
+              id="contrasenia"
+              className={styles.form_style}
               type="password"
               value={formData.contrasenia}
               onChange={handleChange}
@@ -80,17 +81,17 @@ const LoginForm = () => {
             />
           </div>
           <div>
-            <button className="btn" type="submit" disabled={isLoading}>
+            <button className={styles.btn} type="submit" disabled={isLoading}>
               {isLoading ? 'INGRESANDO...' : 'INGRESAR'}
             </button>
-            {error && <p className="error-message">{error}</p>}
+            {error && <p className={styles.errorMessage}>{error}</p>}
             <p>
-              <Link className="link" href="/restablecerContra">
+              <Link className={styles.link} href="/restablecerContra">
                 RESTABLECER CONTRASEÑA
               </Link>
             </p>
             <p>
-              <Link className="link" href="/register">
+              <Link className={styles.link} href="/register">
                 CREAR NUEVA CUENTA
               </Link>
             </p>

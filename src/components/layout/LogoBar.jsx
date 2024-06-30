@@ -1,6 +1,7 @@
 import React, { useContext } from 'react';
 import { useRouter } from 'next/router';
 import { AppContext } from '@/context/AppContext';
+import styles from '@/styles/global/LogoBar.module.css';
 
 const LogoBar = () => {
   const { setUser } = useContext(AppContext);
@@ -13,35 +14,31 @@ const LogoBar = () => {
   };
 
   return (
-    <div className="logo-bar">
-      {/* Logo */}
-      <div className="logo">
+    <div className={styles.logoBar}>
+      <div className={styles.logo}>
         <img
           src={`/imagenes/Labora.png`}
-          style={{ width: "150px", height: "70px", objectFit: "cover" }}
+          className={styles.logoImage}
         />
       </div>
-
-      {/* Enlaces de Navegación */}
-      <nav>
-        <ul>
-          <li>
-            <a href="http://localhost:3000/publicacion">Publica tu actividad</a>
+      <nav className={styles.nav}>
+        <ul className={styles.navList}>
+          <li className={router.pathname === '/publicacion' ? styles.active : ''}>
+            <a href="/publicacion">Publica tu actividad</a>
           </li>
-          <li>
-            <a href="http://localhost:3000/visualizacionPropuestas">
-              Ver Propuestas
-            </a>
+          <li className={router.pathname === '/visualizacionPropuestas' ? styles.active : ''}>
+            <a href="/visualizacionPropuestas">Ver Propuestas</a>
           </li>
-          <li>
-            <a href="#">Mis Trabajos</a>
+          <li className={router.pathname === '/MisTrabajos' ? styles.active : ''}>
+            <a href="/MisTrabajos">Mis Trabajos</a>
+          </li>
+          <li className={router.pathname === '/perfilcliente' ? styles.active : ''}>
+            <a href="/perfilcliente">Perfil</a>
           </li>
         </ul>
       </nav>
-
-      {/* Acciones de Usuario */}
-      <div className="user-actions">
-        <a href="#" onClick={handleLogout}>Cerrar Sesión</a> {/* Mantener el estilo de enlace */}
+      <div className={styles.userActions}>
+        <a href="#" onClick={handleLogout} className={styles.logoutButton}>Cerrar Sesión</a>
       </div>
     </div>
   );

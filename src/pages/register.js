@@ -10,7 +10,7 @@ const RegistrationForm = () => {
     rol: "CLIENTE", // Valor por defecto CLIENTE
   });
   const [error, setError] = useState(null);
-  const [isLoading, setIsLoading] = useState(false); // Estado de carga
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -19,73 +19,72 @@ const RegistrationForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError(null);
-    setIsLoading(true); // Iniciar carga
+    setIsLoading(true);
 
     // Validación básica en el frontend
     if (!formData.nombre || !formData.correo || !formData.contrasenia) {
-      setError("Por favor, completa todos los campos.");
-      setIsLoading(false); // Finalizar carga si hay error
-      return;
+        setError("Por favor, completa todos los campos.");
+        setIsLoading(false); // Finalizar carga si hay error
+        return;
     }
 
     try {
       const response = await fetch("http://localhost:8080/usuarios", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({
+          nombre: formData.nombre,
+          correo: formData.correo,
+          contrasena: formData.contrasenia,
+          rol: formData.rol,
+        }),
       });
 
       if (response.ok) {
         const data = await response.json();
 
-        if (data.rol === "FREELANCER") {
-          // Registrar como freelancer
-          await fetch("http://localhost:8080/freelancers", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({
-                  idusuario: data.idusuario, 
-                  // Opcional, puedes agregar más campos si es necesario:
-                  // calificacion: 0.0, 
-                  // descripcion: "", 
-                  // habilidades: "" 
-              }),
-          });
-      } else if (data.rol === "CLIENTE") {
-        // Registrar como cliente
-        await fetch("http://localhost:8080/clientes", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ idusuario: data.idusuario }), 
-        });
-      } 
+            if (data.rol === "FREELANCER") {
+                // Registrar como freelancer
+                await fetch("http://localhost:8080/freelancers", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        idusuario: data.idusuario, 
+                        // Opcional, puedes agregar más campos si es necesario:
+                        // calificacion: 0.0, 
+                        // descripcion: "", 
+                        // habilidades: "" 
+                    }),
+                });
+            } else if (data.rol === "CLIENTE") {
+                // Registrar como cliente
+                await fetch("http://localhost:8080/clientes", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ idusuario: data.idusuario }), 
+                });
+            } 
 
         router.push("/login");
       } else {
         const errorData = await response.json();
-        setError(errorData.message || "Ocurrió un error durante el registro.");
+        setError(errorData.error || "Ocurrió un error durante el registro.");
       }
     } catch (error) {
-      setError(
-        "Error al registrarse. Inténtalo de nuevo más tarde."
-      );
+      setError("Error al registrarse. Inténtalo de nuevo más tarde.");
       console.error(error);
     } finally {
-      setIsLoading(false); // Finalizar carga en cualquier caso
+        setIsLoading(false); // Finalizar carga en cualquier caso
     }
   };
-
 
   return (
     <div className="container">
       <div className="form_area">
         <p className="title">REGISTRO</p>
         <form onSubmit={handleSubmit}>
-          {/* Campos del formulario (nombre, correo, contraseña) */}
           <div className="form_group">
-            <label className="sub_title" htmlFor="nombre">
-              Nombre Completo
-            </label>
+            <label className="sub_title" htmlFor="nombre">Nombre Completo</label>
             <input
               placeholder="Introduzca su nombre"
               className="form_style"
@@ -97,9 +96,7 @@ const RegistrationForm = () => {
             />
           </div>
           <div className="form_group">
-            <label className="sub_title" htmlFor="correo">
-              Correo
-            </label>
+            <label className="sub_title" htmlFor="correo">Correo</label>
             <input
               placeholder="Introduzca un correo"
               className="form_style"
@@ -111,9 +108,7 @@ const RegistrationForm = () => {
             />
           </div>
           <div className="form_group">
-            <label className="sub_title" htmlFor="contrasenia">
-              Contraseña
-            </label>
+            <label className="sub_title" htmlFor="contrasenia">Contraseña</label>
             <input
               placeholder="Introduzca una contraseña"
               className="form_style"
@@ -132,7 +127,7 @@ const RegistrationForm = () => {
             </label>
             <select
               name="rol"
-              id="rolSelect" 
+              id="rolSelect"
               className="form_style"
               value={formData.rol}
               onChange={handleChange}
@@ -141,10 +136,9 @@ const RegistrationForm = () => {
               <option value="FREELANCER">Freelancer</option>
             </select>
           </div>
-
           <div>
-            <button className="btn" type="submit">
-              CREAR CUENTA
+            <button className="btn" type="submit" disabled={isLoading}>
+              {isLoading ? "Cargando..." : "CREAR CUENTA"}
             </button>
             {error && <p className="error-message">{error}</p>}
           </div>
@@ -155,3 +149,4 @@ const RegistrationForm = () => {
 };
 
 export default RegistrationForm;
+

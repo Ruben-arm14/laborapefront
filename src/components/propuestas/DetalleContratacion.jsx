@@ -2,55 +2,53 @@ import { Button, Box, Typography, Modal, IconButton, TextareaAutosize } from '@m
 import CloseIcon from '@mui/icons-material/Close';
 
 const DetalleContratacion = (props) => {
-    const {open, handleClose, propuesta} = props;
+    const { open, onClose, propuesta } = props;
 
     return (
         <Modal
             open={open}
-            onClose={handleClose}
+            onClose={(_, reason) => {
+                if (reason !== "backdropClick") {
+                    onClose();
+                }
+            }}
             aria-labelledby="modal-title"
             aria-describedby="modal-description"
         >
             <Box sx={{
                 top: '50%',
                 left: '50%',
-                width: '100%',
+                width: '80%',
                 transform: 'translate(-50%, -50%)',
                 bgcolor: 'background.paper',
                 borderRadius: 2,
                 boxShadow: 24,
                 p: 4,
                 position: 'absolute'
-            }}
-                maxWidth='md'>
-                <IconButton sx={{ position: 'absolute', top: 16, right: 16 }} onClick={handleClose}>
+            }}>
+                <IconButton sx={{ position: 'absolute', top: 16, right: 16 }} onClick={onClose}>
                     <CloseIcon />
                 </IconButton>
-                <Box sx={{ display: 'flex', gap: 2 }}>
-                    <Box sx={{ flex: '1 1 auto' }}>
-                        <img src={`/imagenes/${propuesta.imagen}`} alt="propuestaImage" 
-                            style={{ width: '300px', height: '200px', objectFit: 'cover', borderRadius: 8 }} 
-                        />
+                <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
+                    <img src={propuesta.imagenUrl} alt="propuestaImage" 
+                        style={{ width: '100%', maxHeight: '400px', objectFit: 'contain', borderRadius: 8 }} 
+                    />
+                    <Typography variant="h5">{propuesta.titulo}</Typography>
+                    <Typography variant="body1">{propuesta.descripcion}</Typography>
+                    <Typography variant="body2">Lugar: {propuesta.ubicacion}</Typography>
+                    <Typography variant="body2">Fecha límite: {new Date(propuesta.fechaLimite).toLocaleDateString()}</Typography>
+                    <TextareaAutosize
+                        minRows={5}
+                        placeholder="Escribe tu propuesta aquí..."
+                        style={{ width: '100%', marginTop: '16px', padding: '8px', borderRadius: '4px', borderColor: '#ccc' }}
+                    />
+                    <Box sx={{ display: 'flex', justifyContent: 'center', marginTop: 1 }}>
+                        <Button variant="contained" sx={{ mt: 4 }}>ACEPTAR PROPUESTA</Button>
                     </Box>
-                    <Box sx={{ flex: '2 1 auto' }}>
-                        <Typography variant="h6">Lugar donde se realiza (LOCATION)</Typography>
-                        <Typography variant="body2" color="text.secondary">Fecha y hora de publicación</Typography>
-                        <Typography variant="body2" color="text.secondary">INFORMACIÓN EXTRA</Typography>
-                    </Box>
-                </Box>
-                <Typography variant="h5" sx={{ mt: 2 }}>{propuesta.nombre}</Typography>
-                <Typography variant="body1" sx={{ mt: 2 }}>{propuesta.descripcion}</Typography>
-                <TextareaAutosize
-                    minRows={5}
-                    placeholder="Escribe tu propuesta aquí..."
-                    style={{ width: '100%', marginTop: '16px', padding: '8px', borderRadius: '4px', borderColor: '#ccc' }}
-                />
-                <Box sx={{ display: 'flex', justifyContent: 'center', marginTop: 1 }}>
-                    <Button variant="contained" sx={{ mt: 4 }}>ACEPTAR PROPUESTA</Button>
                 </Box>
             </Box>
-      </Modal>
-    )
+        </Modal>
+    );
 }
 
 export default DetalleContratacion;

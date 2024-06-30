@@ -2,7 +2,7 @@ import { Button, Box, Typography, Modal, IconButton, TextareaAutosize } from '@m
 import CloseIcon from '@mui/icons-material/Close';
 
 const DetallePropuesta = (props) => {
-    const {open, handleClose, propuesta, enviar} = props;
+    const {open, handleClose, propuesta } = props;
 
     return (
         <Modal
@@ -46,7 +46,7 @@ const DetallePropuesta = (props) => {
                     style={{ width: '100%', marginTop: '16px', padding: '8px', borderRadius: '4px', borderColor: '#ccc' }}
                 />
                 <Box sx={{ display: 'flex', justifyContent: 'center', marginTop: 1 }}>
-                    <Button variant="contained" sx={{ mt: 4 }} onClick={enviar()}>ENVIAR PROPUESTA</Button>
+                    <Button variant="contained" sx={{ mt: 4 }}>ENVIAR PROPUESTA</Button>
                 </Box>
             </Box>
       </Modal>

@@ -1,0 +1,66 @@
+/* styles/propuestas.css */
+
+.container {
+    text-align: center;
+    padding-top: 50px;
+}
+
+.titlepropuestas {
+    font-size: 40px;
+    margin-bottom: 50px;
+}
+
+.MuiGrid-container {
+    justify-content: center;
+}
+
+.MuiGrid-item {
+    max-width: 300px;  /* Ancho máximo */
+    width: 100%;
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: center;
+    flex: 1; /* Para que los ítems ocupen el mismo espacio */
+}
+
+.MuiCard-root {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    max-width: 300px;  /* Ancho máximo */
+    width: 100%;
+    margin: auto; /* Centrando la tarjeta */
+}
+
+.MuiCardMedia-root {
+    height: 200px; /* Altura fija para las imágenes */
+}
+
+.MuiCardContent-root {
+    flex-grow: 1;
+}
+
+.MuiPagination-root {
+    margin-top: 40px; /* Margen superior */
+}
+
+/* Estilo adicional para asegurar que todas las tarjetas tengan la misma altura */
+.MuiCard-root {
+    min-height: 400px; /* Altura mínima para las tarjetas */
+}
+
+.propuestas-container {
+    display: flex;
+    flex-direction: column; /* Ensuring pagination is always at the bottom */
+    justify-content: space-between;
+    align-items: center;
+    min-height: 70vh; /* Adjust this value as needed */
+    gap: 20px; /* Espacio entre tarjetas */
+}
+
+.pagination-container {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+}

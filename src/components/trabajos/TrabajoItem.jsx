@@ -1,16 +1,22 @@
-import React from 'react';
+import React, { useState } from 'react';
+import EditarTrabajoModal from './EditarTrabajoModal';
 
-const TrabajoItem = ({ trabajo, onPostular }) => {
-  const handlePostular = () => {
-    // Lógica para postularse al trabajo
-    onPostular(trabajo.id);
-  };
+const TrabajoItem = ({ trabajo, onDelete }) => {
+  const [showEditModal, setShowEditModal] = useState(false);
 
   return (
-    <div>
-      <h3>{trabajo.titulo}</h3>
+    <div className="trabajo-item">
+      <h2>{trabajo.titulo}</h2>
       <p>{trabajo.descripcion}</p>
-      <button onClick={handlePostular}>Postularse</button>
+      <button onClick={() => setShowEditModal(true)}>Editar</button>
+      <button onClick={() => onDelete(trabajo.idtrabajo)}>Eliminar</button>
+      {showEditModal && (
+        <EditarTrabajoModal
+          trabajo={trabajo}
+          onClose={() => setShowEditModal(false)}
+          onSave={() => setShowEditModal(false)}
+        />
+      )}
     </div>
   );
 };

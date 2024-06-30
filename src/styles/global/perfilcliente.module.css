@@ -1,0 +1,36 @@
+/* styles/global/perfilcliente.module.css */
+.container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .perfilContainer {
+    max-width: 600px;
+    width: 100%;
+    padding: 20px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    margin-top: 20px;
+    text-align: center;
+  }
+  
+  .perfilImage {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    margin-bottom: 20px;
+  }
+  
+  .perfilDetails {
+    margin-bottom: 20px;
+  }
+  
+  .fullWidthButton {
+    width: 100%;
+    margin-top: 20px;
+  }
+  
+  .uploadButton {
+    margin-top: 20px;
+  }
+  

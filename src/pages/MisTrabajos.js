@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { Box, Grid, Alert } from '@mui/material';
+import { Box, Alert } from '@mui/material';
 import MisTrabajosCard from '@/components/trabajos/MisTrabajosCard';
 import LogoBar from '@/components/layout/LogoBar';
 import { AppContext } from '@/context/AppContext';
 import EditarTrabajoModal from '@/components/trabajos/EditarTrabajoModal';
+import Pagination from '@mui/material/Pagination'; // Importar el componente de paginación
 import styles from '@/styles/global/misTrabajos.module.css';
 
 const MisTrabajos = () => {
@@ -11,6 +12,8 @@ const MisTrabajos = () => {
   const [trabajos, setTrabajos] = useState([]);
   const [error, setError] = useState(null);
   const [trabajoSeleccionado, setTrabajoSeleccionado] = useState(null);
+  const [page, setPage] = useState(1);
+  const itemsPerPage = 4;
 
   useEffect(() => {
     const fetchTrabajos = async () => {
@@ -55,24 +58,32 @@ const MisTrabajos = () => {
     setTrabajoSeleccionado(null);
   };
 
+  const handlePageChange = (event, value) => {
+    setPage(value);
+  };
+
+  const paginatedTrabajos = trabajos.slice((page - 1) * itemsPerPage, page * itemsPerPage);
+
   return (
     <div className="container">
       <LogoBar />
       <h1 className={styles.title}>Mis Trabajos</h1>
       <Box className={styles.trabajosContainer}>
-        {error && <Alert severity="error">{error}</Alert>}
-        <Grid container spacing={3} justifyContent="center">
-          {trabajos.map((trabajo) => (
-            <Grid item key={trabajo.idtrabajo} xs={12} sm={6} md={4} lg={3} className={styles.gridItem}>
-              <MisTrabajosCard
-                trabajo={trabajo}
-                onEdit={handleEdit}
-                onDelete={handleDelete}
-              />
-            </Grid>
+        {error && user == null && <Alert severity="error">{error}</Alert>}
+        <div className={styles.cardContainer}>
+          {paginatedTrabajos.map((trabajo) => (
+            <MisTrabajosCard
+              key={trabajo.idtrabajo}
+              trabajo={trabajo}
+              onEdit={handleEdit}
+              onDelete={handleDelete}
+            />
           ))}
-        </Grid>
+        </div>
       </Box>
+      <div className={styles.paginationContainer}>
+        <Pagination count={Math.ceil(trabajos.length / itemsPerPage)} page={page} onChange={handlePageChange} />
+      </div>
       {trabajoSeleccionado && (
         <EditarTrabajoModal
           trabajo={trabajoSeleccionado}

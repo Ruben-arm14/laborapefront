@@ -1,0 +1,67 @@
+.dialogPaper {
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    max-width: 600px;
+    margin: auto;
+}
+  
+.dialogTitle {
+    text-align: center;
+    font-size: 24px;
+    font-weight: bold;
+    color: #333;
+}
+  
+.dialogContent {
+    text-align: center;
+    padding: 20px;
+}
+  
+.trabajoImage {
+    width: 100%;
+    height: auto;
+    border-radius: 10px;
+    margin-bottom: 10px;
+}
+  
+.trabajoTitulo {
+    font-size: 20px;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+  
+.trabajoDescripcion,
+.trabajoUbicacion,
+.trabajoFechaLimite {
+    font-size: 16px;
+    color: #555;
+    margin-bottom: 10px;
+}
+  
+.presupuestoInput, .mensajeInput {
+    margin-top: 20px;
+}
+  
+.dialogActions {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 20px;
+}
+  
+.cancelButton {
+    background-color: #ccc;
+    color: black;
+    border-radius: 5px;
+    padding: 10px 20px;
+    cursor: pointer;
+    font-size: 14px;
+}
+  
+.postularButton {
+    background-color: #007bff;
+    color: white;
+    border-radius: 5px;
+    padding: 10px 20px;
+    cursor: pointer;
+    font-size: 14px;
+}
