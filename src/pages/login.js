@@ -32,9 +32,17 @@ const LoginForm = () => {
 
       if (response.ok) {
         const userData = await response.json();
-        setUser(userData);
-        localStorage.setItem('usuario', JSON.stringify(userData));
-        router.push(userData.rol === 'CLIENTE' ? '/visualizacionPropuestas' : '/trabajosFreelancer');
+        setUser(userData.usuario);
+        localStorage.setItem('usuario', JSON.stringify(userData.usuario));
+        
+        if (userData.usuario.rol === 'CLIENTE') {
+          localStorage.setItem('idcliente', userData.idcliente);
+          router.push('/visualizacionPropuestas');
+        } else if (userData.usuario.rol === 'FREELANCER') {
+          router.push('/trabajosFreelancer');
+        } else if (userData.usuario.rol === 'ADMIN') {
+          router.push('/trabajosadmin');
+        }
       } else {
         const errorData = await response.json();
         setError(errorData.error || "Credenciales incorrectas");

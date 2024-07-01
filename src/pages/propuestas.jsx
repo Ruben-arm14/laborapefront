@@ -40,7 +40,7 @@ const Propuestas = () => {
       if (!response.ok) {
         throw new Error('Failed to delete postulación');
       }
-      setPropuestas(propuestas.filter(propuesta => propuesta.trabajoId !== propuestaId));
+      setPropuestas(propuestas.filter(propuesta => propuesta.id !== propuestaId));
       setSuccess(true);
     } catch (err) {
       setError(err.message);
@@ -83,7 +83,7 @@ const Propuestas = () => {
                       variant="contained"
                       color="secondary"
                       className={styles.cancelButton}
-                      onClick={() => handleCancel(propuesta.trabajoId)}
+                      onClick={() => handleCancel(propuesta.id)}
                     >
                       CANCELAR POSTULACIÓN
                     </Button>
@@ -91,7 +91,7 @@ const Propuestas = () => {
                 </Grid>
               ))
             ) : (
-              <p>Datos del trabajo no disponibles.</p>
+              <p>No hay postulaciones enviadas.</p>
             )}
           </Grid>
         </Box>

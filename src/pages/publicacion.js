@@ -22,7 +22,8 @@ const Formulario = () => {
   useEffect(() => {
     const storedUser = localStorage.getItem('usuario');
     if (storedUser) {
-      setUser(JSON.parse(storedUser));
+      const parsedUser = JSON.parse(storedUser);
+      setUser(parsedUser);
     }
   }, [setUser]);
 
@@ -40,43 +41,45 @@ const Formulario = () => {
     event.preventDefault();
     setError(null);
     setIsLoading(true);
-
+  
     if (!user) {
       setError("Debes iniciar sesión para publicar una actividad.");
       setIsLoading(false);
       return;
     }
-
+  
     const idcliente = user.idusuario;
+    console.log("ID Cliente:", idcliente); // Verificar si el idcliente es correcto y existe en el localStorage
     const fechaFinISO = formData.fechafin
       ? new Date(formData.fechafin).toISOString().split("T")[0]
       : null;
-
-    const trabajoData = new FormData();
-    trabajoData.append("trabajoData", JSON.stringify({
-      idcliente: idcliente,
-      titulo: formData.titulo,
-      descripcion: formData.descripcion,
-      categoria: formData.categoria,
-      ubicacion: formData.ubicacion,
-      fechaLimite: fechaFinISO,
-      estado: "ABIERTO",
-      presupuesto: formData.presupuesto
-    }));
+  
+      const trabajoData = new FormData();
+      trabajoData.append("trabajoData", JSON.stringify({
+        idcliente: idcliente,
+        titulo: formData.titulo,
+        descripcion: formData.descripcion,
+        categoria: formData.categoria,
+        ubicacion: formData.ubicacion,
+        fechaLimite: fechaFinISO,
+        estado: "EN_REVISION",
+        presupuesto: parseFloat(formData.presupuesto)
+      }));
+      
     if (formData.imagen) {
       trabajoData.append("imagen", formData.imagen);
     }
-
+  
     try {
       const response = await fetch("http://localhost:8080/trabajos", {
         method: "POST",
         body: trabajoData
       });
-
+  
       setIsLoading(false);
-
+  
       if (response.ok) {
-        alert("La actividad se ha enviado correctamente");
+        alert("La actividad se ha enviado correctamente y está en revisión");
         router.push("/MisTrabajos");
         setFormData({
           titulo: "",
@@ -96,7 +99,7 @@ const Formulario = () => {
       console.error(error);
     }
   };
-
+  
   return (
     <div className={styles.bodyNoMargin}>
       <LogoBar />

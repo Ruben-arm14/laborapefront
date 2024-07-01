@@ -11,15 +11,13 @@ const TrabajosFreelancer = () => {
   const [error, setError] = useState(null);
   const [open, setOpen] = useState(false);
   const [selectedTrabajo, setSelectedTrabajo] = useState(null);
-  const [mensaje, setMensaje] = useState('');
-  const [success, setSuccess] = useState(false);
   const [page, setPage] = useState(1);
   const [rowsPerPage] = useState(4);
 
   useEffect(() => {
     const fetchTrabajos = async () => {
       try {
-        const response = await fetch('http://localhost:8080/trabajos');
+        const response = await fetch('http://localhost:8080/trabajos/estado/APROBADO'); // Solo trabajos aprobados
         if (!response.ok) {
           throw new Error("Error HTTP! status: " + response.status);
         }
@@ -34,7 +32,6 @@ const TrabajosFreelancer = () => {
   }, []);
 
   const handleOpen = (trabajo) => {
-    console.log('Abriendo popup para trabajo:', trabajo); // Verifica los datos del trabajo aquí
     setSelectedTrabajo(trabajo);
     setOpen(true);
   };
@@ -42,40 +39,13 @@ const TrabajosFreelancer = () => {
   const handleClose = () => {
     setOpen(false);
     setSelectedTrabajo(null);
-    setMensaje('');
   };
 
-  const handlePostulacion = async () => {
-    if (user && user.idusuario && selectedTrabajo && mensaje) {
-      try {
-        const postulacionData = {
-          freelancerId: user.idusuario,
-          trabajoId: selectedTrabajo.idtrabajo,
-          clienteId: selectedTrabajo.cliente.idcliente,
-          mensaje: mensaje,
-          presupuesto: selectedTrabajo.presupuesto
-        };
-
-        const response = await fetch('http://localhost:8080/postulaciones', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(postulacionData),
-        });
-
-        if (!response.ok) {
-          throw new Error("Error HTTP! status: " + response.status);
-        }
-
-        setSuccess(true);
-        handleClose();
-      } catch (err) {
-        setError(err.message);
-      }
-    } else {
-      setError("Datos incompletos para realizar la postulación.");
-    }
+  const handlePostular = async () => {
+    // Filtrar los trabajos para eliminar el trabajo seleccionado después de postular
+    const updatedTrabajos = trabajos.filter(trabajo => trabajo.idtrabajo !== selectedTrabajo.idtrabajo);
+    setTrabajos(updatedTrabajos);
+    handleClose();
   };
 
   const handleChangePage = (event, newPage) => {
@@ -93,15 +63,16 @@ const TrabajosFreelancer = () => {
         <h1 className={styles.titleFreelancer}>Trabajos Disponibles</h1>
         <Box className={styles.trabajosContainerFreelancer}>
           {error && <Alert severity="error">{error}</Alert>}
-          {success && <Alert severity="success">¡Su postulación ha sido enviada!</Alert>}
-          <Grid container spacing={2} justifyContent="center">
+          <Grid container spacing={4} justifyContent="center">
             {currentTrabajos.map((trabajo, index) => (
               <Grid item key={index} className={styles.trabajoItemFreelancer}>
                 <div className={styles.trabajoDetailsFreelancer}>
                   <img src={`http://localhost:8080/trabajos/${trabajo.idtrabajo}/imagen`} alt={trabajo.titulo} className={styles.trabajoImageFreelancer} />
                   <Typography variant="h6" className={styles.trabajoTitulo}>{trabajo.titulo}</Typography>
-                  <Typography variant="body1" className={styles.trabajoDescripcion}>{trabajo.descripcion}</Typography>
-                  <Typography variant="body2" className={styles.trabajoPresupuesto}>Presupuesto: {trabajo.presupuesto}</Typography>
+                  <Typography variant="body1" className={styles.trabajoDescripcionFreelancer}>{trabajo.descripcion}</Typography>
+                  <Typography variant="body2" className={styles.trabajoPresupuestoFreelancer}>Presupuesto: {trabajo.presupuesto}</Typography>
+                  <Typography variant="body2" className={styles.trabajoClienteFreelancer}>Cliente: {trabajo.nombreCliente || 'Desconocido'}</Typography>
+                  <Typography variant="body2" className={styles.trabajoUbicacionFreelancer}>Ubicación: {trabajo.ubicacion}</Typography>
                   <button className={styles.postularButtonFreelancer} onClick={() => handleOpen(trabajo)}>POSTULAR</button>
                 </div>
               </Grid>
@@ -120,7 +91,8 @@ const TrabajosFreelancer = () => {
           open={open}
           onClose={handleClose}
           trabajo={selectedTrabajo}
-          freelancerId={user.idusuario}
+          freelancer={user} // Pasamos el objeto completo del usuario
+          onPostular={handlePostular}
         />
       )}
     </>

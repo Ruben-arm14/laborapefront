@@ -8,6 +8,9 @@ const RegistrationForm = () => {
     correo: "",
     contrasenia: "",
     rol: "CLIENTE", // Valor por defecto CLIENTE
+    edad: "",
+    sexo: "Hombre", // Valor por defecto Hombre
+    numero: "",
   });
   const [error, setError] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -20,16 +23,16 @@ const RegistrationForm = () => {
     e.preventDefault();
     setError(null);
     setIsLoading(true);
-
-    // Validación básica en el frontend
-    if (!formData.nombre || !formData.correo || !formData.contrasenia) {
-        setError("Por favor, completa todos los campos.");
-        setIsLoading(false); // Finalizar carga si hay error
-        return;
+  
+    if (!formData.nombre || !formData.correo || !formData.contrasenia || !formData.edad || !formData.sexo || !formData.numero) {
+      setError("Por favor, completa todos los campos.");
+      setIsLoading(false);
+      return;
     }
-
+  
     try {
-      const response = await fetch("http://localhost:8080/usuarios", {
+      // Paso 1: Crear el usuario
+      const responseUsuario = await fetch("http://localhost:8080/usuarios", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -37,47 +40,65 @@ const RegistrationForm = () => {
           correo: formData.correo,
           contrasena: formData.contrasenia,
           rol: formData.rol,
+          edad: formData.edad,
+          sexo: formData.sexo,
+          numero: formData.numero,
         }),
       });
-
-      if (response.ok) {
-        const data = await response.json();
-
-            if (data.rol === "FREELANCER") {
-                // Registrar como freelancer
-                await fetch("http://localhost:8080/freelancers", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                        idusuario: data.idusuario, 
-                        // Opcional, puedes agregar más campos si es necesario:
-                        // calificacion: 0.0, 
-                        // descripcion: "", 
-                        // habilidades: "" 
-                    }),
-                });
-            } else if (data.rol === "CLIENTE") {
-                // Registrar como cliente
-                await fetch("http://localhost:8080/clientes", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ idusuario: data.idusuario }), 
-                });
-            } 
-
-        router.push("/login");
-      } else {
-        const errorData = await response.json();
-        setError(errorData.error || "Ocurrió un error durante el registro.");
+  
+      if (!responseUsuario.ok) {
+        const errorData = await responseUsuario.json();
+        throw new Error(errorData.error || "Error al crear el usuario.");
       }
+  
+      const dataUsuario = await responseUsuario.json();
+  
+      // Paso 2: Crear el cliente o freelancer
+      if (dataUsuario.rol === "FREELANCER") {
+        await crearFreelancer(dataUsuario.idusuario);
+      } else if (dataUsuario.rol === "CLIENTE") {
+        await crearCliente(dataUsuario.idusuario, formData.nombre);
+      }
+  
+      router.push("/login");
     } catch (error) {
-      setError("Error al registrarse. Inténtalo de nuevo más tarde.");
+      setError(error.message);
       console.error(error);
     } finally {
-        setIsLoading(false); // Finalizar carga en cualquier caso
+      setIsLoading(false);
     }
   };
-
+  
+  const crearCliente = async (idusuario, nombre) => {
+    const responseCliente = await fetch("http://localhost:8080/clientes", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ idusuario, nombre }),
+    });
+  
+    if (!responseCliente.ok) {
+      const errorData = await responseCliente.json();
+      throw new Error(errorData.error || "Error al crear el cliente.");
+    }
+  
+    return responseCliente.json();
+  };
+  
+  const crearFreelancer = async (idusuario) => {
+    const responseFreelancer = await fetch("http://localhost:8080/freelancers", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ idusuario }),
+    });
+  
+    if (!responseFreelancer.ok) {
+      const errorData = await responseFreelancer.json();
+      throw new Error(errorData.error || "Error al crear el freelancer.");
+    }
+  
+    return responseFreelancer.json();
+  };
+  
   return (
     <div className="container">
       <div className="form_area">
@@ -119,21 +140,54 @@ const RegistrationForm = () => {
               required
             />
           </div>
-
-          {/* Selección de Rol (con estilo corregido) */}
-          <div className="form_group"> 
-            <label className="sub_title" htmlFor="rol">
-              ¿Qué desea en la app?
-            </label>
+          <div className="form_group">
+            <label className="sub_title" htmlFor="edad">Edad</label>
+            <input
+              placeholder="Introduzca su edad"
+              className="form_style"
+              type="number"
+              name="edad"
+              value={formData.edad}
+              onChange={handleChange}
+              required
+            />
+          </div>
+          <div className="form_group">
+            <label className="sub_title" htmlFor="sexo">Sexo</label>
+            <select
+              name="sexo"
+              className="form_style"
+              value={formData.sexo}
+              onChange={handleChange}
+              required
+            >
+              <option value="Hombre">Hombre</option>
+              <option value="Mujer">Mujer</option>
+            </select>
+          </div>
+          <div className="form_group">
+            <label className="sub_title" htmlFor="numero">Número</label>
+            <input
+              placeholder="Introduzca su número"
+              className="form_style"
+              type="text"
+              name="numero"
+              value={formData.numero}
+              onChange={handleChange}
+              required
+            />
+          </div>
+          <div className="form_group">
+            <label className="sub_title" htmlFor="rol">¿Qué desea en la app?</label>
             <select
               name="rol"
-              id="rolSelect"
               className="form_style"
               value={formData.rol}
               onChange={handleChange}
+              required
             >
-              <option value="CLIENTE">Cliente</option>
-              <option value="FREELANCER">Freelancer</option>
+              <option value="CLIENTE">CLIENTE</option>
+              <option value="FREELANCER">FREELANCER</option>
             </select>
           </div>
           <div>
@@ -149,4 +203,3 @@ const RegistrationForm = () => {
 };
 
 export default RegistrationForm;
-
