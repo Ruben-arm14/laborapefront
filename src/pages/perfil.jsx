@@ -32,31 +32,32 @@ const Perfil = () => {
   
   useEffect(() => {
     if (!user) {
-      return;
+        return;
     }
     console.log(`Usuario actual: ${user.nombre}`);
-    fetch(`http://localhost:8080/usuarios/perfil/${user.idusuario}`)
-      .then(response => {
-        if (!response.ok) {
-          throw new Error("Error al obtener el perfil");
-        }
-        return response.json();
-      })
-      .then(data => {
-        setPerfil(data);
-        setFormPerfil({
-          nombre: data.nombre,
-          edad: data.edad,
-          sexo: data.sexo,
-          email: data.correo,
-          contrasena: data.contrasena,
-          numero: data.numero,
-          habilidades: data.habilidades,
-          imagenUrl: data.imagen ? `data:image/png;base64,${data.imagen}` : "https://via.placeholder.com/150"
-        });
-      })
-      .catch(error => console.error("Error al obtener el perfil:", error));
-  }, [user]);
+    fetch(`http://localhost:8080/usuarios/perfilfreelancer/${user.idusuario}`)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error("Error al obtener el perfil");
+            }
+            return response.json();
+        })
+        .then(data => {
+            setPerfil(data);
+            setFormPerfil({
+                nombre: data.nombre,
+                edad: data.edad,
+                sexo: data.sexo,
+                email: data.correo,
+                contrasena: data.contrasena,
+                numero: data.numero,
+                habilidades: data.habilidades,
+                imagenUrl: data.imagen ? `data:image/png;base64,${data.imagen}` : "https://via.placeholder.com/150"
+            });
+        })
+        .catch(error => console.error("Error al obtener el perfil:", error));
+}, [user]);
+
   
 
   const handleChange = (e) => {

@@ -35,7 +35,7 @@ const PerfilCliente = () => {
             numero: data.numero,
             contrasena: data.contrasena,
             imagen: null,
-            imagenUrl: data.imagenUrl || `http://localhost:8080/usuarios/${idUsuario}/imagen`
+            imagenUrl: data.imagenUrl || "https://via.placeholder.com/150"
           });
         } else {
           throw new Error("Error al obtener el perfil");
