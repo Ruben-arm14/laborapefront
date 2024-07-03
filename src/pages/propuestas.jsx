@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useContext } from 'react';
-import { Box, Grid, Alert, Button, Snackbar } from '@mui/material';
+import { Box, Grid, Alert, Button, Snackbar, Typography } from '@mui/material';
 import LogoBarFreelance from '@/components/layout/LogoBarFreelance';
 import { AppContext } from '@/context/AppContext';
 import styles from '@/styles/global/verPropuestas.module.css';
@@ -11,13 +11,14 @@ const Propuestas = () => {
   const [success, setSuccess] = useState(false);
 
   useEffect(() => {
+    if (!user || !user.idfreelancer) {
+      setError("Debes iniciar sesión para ver tus postulaciones.");
+      return;
+    }
+
     const fetchPropuestas = async () => {
-      if (!user) {
-        setError("Debes iniciar sesión para ver tus postulaciones.");
-        return;
-      }
       try {
-        const response = await fetch(`http://localhost:8080/postulaciones/freelancer/${user.idusuario}`);
+        const response = await fetch(`http://localhost:8080/postulaciones/freelancer/${user.idfreelancer}`);
         if (!response.ok) {
           throw new Error("Error HTTP! status: " + response.status);
         }
@@ -65,33 +66,45 @@ const Propuestas = () => {
               propuestas.map((propuesta, index) => (
                 <Grid item key={index} className={styles.propuestaItem}>
                   <div className={styles.propuestaDetails}>
-                    {propuesta.imagenBase64 ? (
+                    {propuesta.trabajo.imagen ? (
                       <img
-                        src={`data:image/jpeg;base64,${propuesta.imagenBase64}`}
-                        alt={propuesta.tituloTrabajo}
+                        src={`data:image/jpeg;base64,${propuesta.trabajo.imagen}`}
+                        alt={propuesta.trabajo.titulo}
                         className={styles.trabajoImage}
                       />
                     ) : (
                       <p>Imagen no disponible.</p>
                     )}
-                    <h2 className={styles.trabajoTitle}>{propuesta.tituloTrabajo}</h2>
-                    <p className={styles.trabajoDescription}>{propuesta.descripcionTrabajo}</p>
-                    <p><strong>Mensaje:</strong> {propuesta.mensaje}</p>
-                    <p><strong>Presupuesto:</strong> {propuesta.presupuesto}</p>
-                    <p><strong>Estado:</strong> {propuesta.estadoTrabajo}</p>
-                    <Button
-                      variant="contained"
-                      color="secondary"
-                      className={styles.cancelButton}
-                      onClick={() => handleCancel(propuesta.id)}
-                    >
-                      CANCELAR POSTULACIÓN
-                    </Button>
+                    <Typography variant="h6" className={styles.trabajoTitle}>{propuesta.trabajo.titulo}</Typography>
+                    <Typography variant="body1" className={styles.trabajoDescription}>{propuesta.trabajo.descripcion}</Typography>
+                    <Typography variant="body2" className={styles.trabajoUbicacion}>Ubicación: {propuesta.trabajo.ubicacion}</Typography>
+                    <Typography variant="body2" className={styles.trabajoPresupuesto}>Presupuesto: {propuesta.presupuesto}</Typography>
+                    <Typography variant="body2" className={styles.trabajoDisponibilidad}>Disponibilidad: {propuesta.disponibilidad}</Typography>
+                    <Typography variant="body2" className={styles.trabajoEstado}>Estado: {propuesta.estado}</Typography>
+                    {propuesta.estado === 'ACEPTADA' ? (
+                      <Button
+                        variant="contained"
+                        color="primary"
+                        className={styles.contactButton}
+                        onClick={() => alert(`Contacto del cliente: ${propuesta.trabajo.cliente.contacto}`)}
+                      >
+                        VER CONTACTO DEL CLIENTE
+                      </Button>
+                    ) : (
+                      <Button
+                        variant="contained"
+                        color="secondary"
+                        className={styles.cancelButton}
+                        onClick={() => handleCancel(propuesta.id)}
+                      >
+                        ELIMINAR POSTULACIÓN
+                      </Button>
+                    )}
                   </div>
                 </Grid>
               ))
             ) : (
-              <p>No hay postulaciones enviadas.</p>
+              <Typography>No hay postulaciones enviadas.</Typography>
             )}
           </Grid>
         </Box>

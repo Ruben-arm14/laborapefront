@@ -22,14 +22,40 @@ const TrabajosFreelancer = () => {
           throw new Error("Error HTTP! status: " + response.status);
         }
         const data = await response.json();
-        setTrabajos(data);
+        return data;
       } catch (err) {
         setError(err.message);
+        return [];
       }
     };
 
-    fetchTrabajos();
-  }, []);
+    const fetchPostulaciones = async () => {
+      try {
+        const response = await fetch(`http://localhost:8080/postulaciones/freelancer/${user.idfreelancer}`);
+        if (!response.ok) {
+          throw new Error("Error HTTP! status: " + response.status);
+        }
+        const data = await response.json();
+        return data.map(postulacion => postulacion.trabajo.idtrabajo);
+      } catch (err) {
+        setError(err.message);
+        return [];
+      }
+    };
+
+    const fetchData = async () => {
+      const trabajosData = await fetchTrabajos();
+      const postulacionesData = await fetchPostulaciones();
+      console.log("Trabajos obtenidos:", trabajosData);
+      console.log("Postulaciones obtenidas:", postulacionesData);
+      const trabajosFiltrados = trabajosData.filter(trabajo => !postulacionesData.includes(trabajo.idtrabajo));
+      setTrabajos(trabajosFiltrados);
+    };
+
+    if (user && user.idfreelancer) {
+      fetchData();
+    }
+  }, [user]);
 
   useEffect(() => {
     if (!user || !user.idusuario) return;
@@ -55,7 +81,6 @@ const TrabajosFreelancer = () => {
     fetchFreelancerProfile();
   }, [user && user.idusuario, setUser]); // Asegurarse de que el user.idusuario sea evaluado correctamente
 
-  
   const handleOpen = (trabajo) => {
     // Verificar si el freelancer tiene habilidades
     if (!user.habilidades || user.habilidades.trim() === "") {

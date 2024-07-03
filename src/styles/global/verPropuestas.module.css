@@ -1,48 +1,57 @@
 .container {
-    padding: 20px;
-  }
-  
-  .title {
-    text-align: center;
-    margin-bottom: 20px;
-  }
-  
-  .propuestasWrapper {
-    max-width: 1200px;
-    margin: 0 auto;
-  }
-  
-  .propuestaItem {
-    display: flex;
-    justify-content: center;
-    margin-bottom: 20px;
-  }
-  
-  .propuestaDetails {
-    border: 1px solid #ddd;
-    padding: 20px;
-    border-radius: 8px;
-    text-align: center;
-    max-width: 300px;
-  }
-  
-  .trabajoImage {
-    max-width: 100%;
-    height: auto;
-    margin-bottom: 20px;
-  }
-  
-  .trabajoTitle {
-    font-size: 1.5em;
-    margin-bottom: 10px;
-  }
-  
-  .trabajoDescription {
-    margin-bottom: 10px;
-  }
-  
-  .cancelButton {
-    background-color: red;
-    color: white;
-  }
-  
+  padding: 20px;
+}
+
+.title {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.propuestasWrapper {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.propuestaItem {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.propuestaDetails {
+  border: 1px solid #ddd;
+  padding: 20px;
+  border-radius: 8px;
+  text-align: center;
+  max-width: 300px;
+  background-color: #f9f9f9;
+}
+
+.trabajoImage {
+  max-width: 100%;
+  height: auto;
+  margin-bottom: 20px;
+}
+
+.trabajoTitle {
+  font-size: 1.5em;
+  margin-bottom: 10px;
+}
+
+.trabajoDescription {
+  margin-bottom: 10px;
+}
+
+.trabajoUbicacion, .trabajoPresupuesto, .trabajoDisponibilidad, .trabajoEstado {
+  margin-bottom: 5px;
+}
+
+.cancelButton {
+  background-color: red;
+  color: white;
+}
+
+.contactButton {
+  background-color: green;
+  color: white;
+}
