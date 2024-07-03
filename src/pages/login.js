@@ -33,10 +33,10 @@ const LoginForm = () => {
       if (response.ok) {
         const userData = await response.json();
         setUser(userData.usuario);
-        localStorage.setItem('usuario', JSON.stringify(userData.usuario));
+        sessionStorage.setItem('usuario', JSON.stringify(userData.usuario)); // Cambiado a sessionStorage
         
         if (userData.usuario.rol === 'CLIENTE') {
-          localStorage.setItem('idcliente', userData.idcliente);
+          sessionStorage.setItem('idcliente', userData.idcliente);
           router.push('/visualizacionPropuestas');
         } else if (userData.usuario.rol === 'FREELANCER') {
           router.push('/trabajosFreelancer');

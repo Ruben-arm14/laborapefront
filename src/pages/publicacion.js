@@ -20,7 +20,7 @@ const Formulario = () => {
   });
 
   useEffect(() => {
-    const storedUser = localStorage.getItem('usuario');
+    const storedUser = sessionStorage.getItem('usuario');
     if (storedUser) {
       const parsedUser = JSON.parse(storedUser);
       setUser(parsedUser);
@@ -41,43 +41,50 @@ const Formulario = () => {
     event.preventDefault();
     setError(null);
     setIsLoading(true);
-  
+
     if (!user) {
       setError("Debes iniciar sesión para publicar una actividad.");
       setIsLoading(false);
       return;
     }
-  
-    const idcliente = user.idusuario;
-    console.log("ID Cliente:", idcliente); // Verificar si el idcliente es correcto y existe en el localStorage
+
+    // Verificar si el rol del usuario es "CLIENTE"
+    if (user.rol !== 'CLIENTE') {
+      setError("Solo los usuarios con rol CLIENTE pueden publicar actividades.");
+      setIsLoading(false);
+      return;
+    }
+
+    const idcliente = user.idusuario; // Asegúrate de que este es el ID correcto
+
     const fechaFinISO = formData.fechafin
-      ? new Date(formData.fechafin).toISOString().split("T")[0]
+      ? new Date(formData.fechafin).toISOString().replace(':', '%3A')
       : null;
-  
-      const trabajoData = new FormData();
-      trabajoData.append("trabajoData", JSON.stringify({
-        idcliente: idcliente,
-        titulo: formData.titulo,
-        descripcion: formData.descripcion,
-        categoria: formData.categoria,
-        ubicacion: formData.ubicacion,
-        fechaLimite: fechaFinISO,
-        estado: "EN_REVISION",
-        presupuesto: parseFloat(formData.presupuesto)
-      }));
-      
+
+    const trabajoData = new FormData();
+    trabajoData.append("trabajoData", JSON.stringify({
+      idcliente: idcliente,
+      titulo: formData.titulo,
+      descripcion: formData.descripcion,
+      categoria: formData.categoria,
+      ubicacion: formData.ubicacion,
+      fechaLimite: fechaFinISO,
+      estado: "EN_REVISION",
+      presupuesto: parseFloat(formData.presupuesto)
+    }));
+
     if (formData.imagen) {
       trabajoData.append("imagen", formData.imagen);
     }
-  
+
     try {
       const response = await fetch("http://localhost:8080/trabajos", {
         method: "POST",
         body: trabajoData
       });
-  
+
       setIsLoading(false);
-  
+
       if (response.ok) {
         alert("La actividad se ha enviado correctamente y está en revisión");
         router.push("/MisTrabajos");
@@ -99,7 +106,13 @@ const Formulario = () => {
       console.error(error);
     }
   };
-  
+
+  // Calcular la fecha mínima y máxima
+  const minDate = new Date().toISOString().split("T")[0];
+  const maxDate = new Date();
+  maxDate.setDate(maxDate.getDate() + 2);
+  const maxDateString = maxDate.toISOString().split("T")[0];
+
   return (
     <div className={styles.bodyNoMargin}>
       <LogoBar />
@@ -118,7 +131,7 @@ const Formulario = () => {
               name="descripcion"
               value={formData.descripcion}
               onChange={handleInputChange}
-              rows={3} // Reduced height
+              rows={3}
               placeholder="Escribe la descripción de la actividad"
             />
           </div>
@@ -127,7 +140,7 @@ const Formulario = () => {
             <input type="text" id="ubicacion" name="ubicacion" value={formData.ubicacion} onChange={handleInputChange} />
           </div>
           <div className={styles.formGroup}>
-            <label htmlFor="presupuesto">Presupuesto:</label>
+            <label htmlFor="presupuesto">Presupuesto Promedio:</label>
             <input type="text" id="presupuesto" name="presupuesto" value={formData.presupuesto} onChange={handleInputChange} />
           </div>
           <div className={styles.formGroup}>
@@ -148,7 +161,7 @@ const Formulario = () => {
           </div>
           <div className={styles.formGroup}>
             <label htmlFor="fechafin">Disponibilidad de la tarea:</label>
-            <input type="date" id="fechafin" name="fechafin" value={formData.fechafin} onChange={handleInputChange} />
+            <input type="datetime-local" id="fechafin" name="fechafin" value={formData.fechafin} onChange={handleInputChange} min={minDate} max={maxDateString} className={styles.dateInput} />
           </div>
           <button type="submit" className={styles.submitButton} disabled={isLoading}>
             {isLoading ? 'Enviando...' : 'Enviar'}

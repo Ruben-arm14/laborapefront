@@ -21,50 +21,34 @@ const PerfilCliente = () => {
   });
 
   useEffect(() => {
-    const usuario = JSON.parse(localStorage.getItem("usuario"));
-    console.log("Usuario desde localStorage:", usuario);
-    if (usuario && usuario.idusuario) {
-        const idUsuario = usuario.idusuario;
-        console.log("ID del usuario:", idUsuario);
-  
-        if (idUsuario) {
-            const url = `http://localhost:8080/usuarios/perfil/${idUsuario}`;
-            console.log("URL de la solicitud:", url);
-  
-            fetch(url)
-                .then(response => {
-                    console.log("Respuesta de la API:", response);
-                    if (!response.ok) {
-                        if (response.status === 403) {
-                            throw new Error("No autorizado para ver este perfil");
-                        }
-                        throw new Error("Error al obtener el perfil");
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    console.log("Datos obtenidos del perfil:", data);
-                    if (data.rol !== 'CLIENTE') {
-                        throw new Error("No autorizado para ver este perfil");
-                    }
-                    setPerfil(data);
-                    setFormPerfil({
-                        nombre: data.nombre,
-                        edad: data.edad,
-                        sexo: data.sexo,
-                        email: data.correo,
-                        numero: data.numero,
-                        contrasena: data.contrasena,
-                        imagen: null,
-                        imagenUrl: data.imagenUrl || `http://localhost:8080/usuarios/${idUsuario}/imagen`
-                    });
-                })
-                .catch(error => console.error("Error al obtener el perfil:", error));
+    const fetchPerfil = async (idUsuario) => {
+      try {
+        const response = await fetch(`http://localhost:8080/usuarios/perfil/${idUsuario}`);
+        if (response.ok) {
+          const data = await response.json();
+          setPerfil(data);
+          setFormPerfil({
+            nombre: data.nombre,
+            edad: data.edad,
+            sexo: data.sexo,
+            email: data.correo,
+            numero: data.numero,
+            contrasena: data.contrasena,
+            imagen: null,
+            imagenUrl: data.imagenUrl || `http://localhost:8080/usuarios/${idUsuario}/imagen`
+          });
+        } else {
+          throw new Error("Error al obtener el perfil");
         }
-    } else {
-        console.error("No se pudo obtener el ID del usuario de localStorage.");
+      } catch (error) {
+        console.error("Error al obtener el perfil:", error);
+      }
+    };
+
+    if (user) {
+      fetchPerfil(user.idusuario);
     }
-  }, []);
+  }, [user]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -91,17 +75,17 @@ const PerfilCliente = () => {
 
   const handleGuardarPerfil = async () => {
     setIsLoading(true);
-    const idUsuario = JSON.parse(localStorage.getItem("usuario")).idusuario;
+    const idUsuario = user.idusuario;
 
     try {
       const formData = new FormData();
       formData.append("nombre", formPerfil.nombre);
-      formData.append("edad", formPerfil.edad);
-      formData.append("sexo", formPerfil.sexo);
+      formData.append("edad", perfil.edad); // No permitir cambiar edad
+      formData.append("sexo", perfil.sexo); // No permitir cambiar sexo
       formData.append("correo", formPerfil.email);
       formData.append("numero", formPerfil.numero);
       formData.append("contrasena", formPerfil.contrasena);
-      formData.append("rol", perfil.rol); // Asegúrate de enviar el rol también
+      formData.append("rol", perfil.rol); // No permitir cambiar rol
       if (formPerfil.imagen) {
         formData.append("imagen", formPerfil.imagen);
       }
@@ -154,19 +138,17 @@ const PerfilCliente = () => {
                 name="edad"
                 type="number"
                 value={formPerfil.edad}
-                onChange={handleChange}
                 fullWidth
                 required
                 margin="normal"
+                disabled // Deshabilitar el cambio de edad
               />
-              <FormControl fullWidth margin="normal">
+              <FormControl fullWidth margin="normal" disabled>
                 <InputLabel>Sexo</InputLabel>
                 <Select
                   name="sexo"
                   value={formPerfil.sexo}
-                  onChange={handleChange}
                   required
-                  disabled // Deshabilitar el cambio de sexo
                 >
                   <MenuItem value="Hombre">Hombre</MenuItem>
                   <MenuItem value="Mujer">Mujer</MenuItem>

@@ -1,22 +1,39 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { Box, Grid, Button, Alert } from '@mui/material';
-import LogoBarAdmin from '@/components/layout/logobaradmin';
+import LogoBarAdmin from '@/components/layout/LogoBarAdmin';
+import { AppContext } from '@/context/AppContext';
 import styles from '@/styles/global/vertrabajos.module.css';
 
 const TrabajosAdmin = () => {
+  const { user, setUser } = useContext(AppContext);
   const [trabajos, setTrabajos] = useState([]);
   const [error, setError] = useState(null);
   const [alerta, setAlerta] = useState(null);
 
   useEffect(() => {
-    fetchTrabajosEnRevision();
-  }, []);
+    const storedUser = sessionStorage.getItem('usuario');
+    if (storedUser) {
+      const parsedUser = JSON.parse(storedUser);
+      setUser(parsedUser);
+      console.log("Usuario almacenado:", parsedUser);
+    }
+  }, [setUser]);
+
+  useEffect(() => {
+    console.log("Usuario actual:", user);
+    if (user && user.rol === 'ADMIN') {
+      fetchTrabajosEnRevision();
+    } else {
+      setError("No tienes permisos para ver esta página.");
+    }
+  }, [user]);
 
   const fetchTrabajosEnRevision = async () => {
     try {
       const response = await fetch('http://localhost:8080/trabajos/estado/EN_REVISION');
       if (!response.ok) {
-        throw new Error('Error al obtener trabajos en revisión');
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Error al obtener trabajos en revisión');
       }
       const data = await response.json();
       setTrabajos(data);
@@ -31,7 +48,8 @@ const TrabajosAdmin = () => {
         method: 'PUT'
       });
       if (!response.ok) {
-        throw new Error('Error al aprobar trabajo');
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Error al aprobar trabajo');
       }
       const result = await response.json();
       setAlerta(result.message);
@@ -47,7 +65,8 @@ const TrabajosAdmin = () => {
         method: 'PUT'
       });
       if (!response.ok) {
-        throw new Error('Error al desaprobar trabajo');
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Error al desaprobar trabajo');
       }
       const result = await response.json();
       setAlerta(result.message);

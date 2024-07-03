@@ -9,7 +9,7 @@ const EditarTrabajoModal = ({ trabajo, onClose }) => {
     descripcion: trabajo.descripcion || '',
     categoria: trabajo.categoria || '',
     ubicacion: trabajo.ubicacion || '',
-    fechaLimite: trabajo.fechaLimite ? new Date(trabajo.fechaLimite).toISOString().split('T')[0] : '',
+    fechaLimite: trabajo.fechaLimite ? new Date(trabajo.fechaLimite).toISOString().slice(0, 16) : '',
     presupuesto: trabajo.presupuesto || '',
     imagen: null,
     idcliente: trabajo.cliente ? trabajo.cliente.idcliente : (user ? user.idusuario : '')
@@ -54,9 +54,9 @@ const EditarTrabajoModal = ({ trabajo, onClose }) => {
       descripcion: formData.descripcion,
       categoria: formData.categoria,
       ubicacion: formData.ubicacion,
-      fechaLimite: formData.fechaLimite,
+      fechaLimite: new Date(formData.fechaLimite).toISOString(), // Formato correcto de la fecha
       presupuesto: formData.presupuesto,
-      estado: trabajo.estado,
+      estado: "EN_REVISION", // Estado actualizado
       idcliente: formData.idcliente,
     }));
     if (formData.imagen) {
@@ -69,7 +69,7 @@ const EditarTrabajoModal = ({ trabajo, onClose }) => {
         body: data,
       });
       if (response.ok) {
-        alert('Trabajo actualizado con éxito');
+        alert('El trabajo fue modificado, lo está revisando un admin');
         onClose();
         window.location.reload();
       } else {
@@ -112,13 +112,18 @@ const EditarTrabajoModal = ({ trabajo, onClose }) => {
             </div>
             <div className={styles.formGroup}>
               <label>Categoría</label>
-              <input
-                type="text"
+              <select
                 name="categoria"
                 value={formData.categoria}
                 onChange={handleChange}
                 className={styles.input}
-              />
+              >
+                <option value="Carpinteria">Carpintería</option>
+                <option value="Electricista">Electricista</option>
+                <option value="Mecanico">Mecánico</option>
+                <option value="Plomero">Plomero</option>
+                <option value="Otro">Otro</option>
+              </select>
             </div>
             <div className={styles.formGroup}>
               <label>Ubicación</label>
@@ -133,7 +138,7 @@ const EditarTrabajoModal = ({ trabajo, onClose }) => {
             <div className={styles.formGroup}>
               <label>Fecha Límite</label>
               <input
-                type="date"
+                type="datetime-local"
                 name="fechaLimite"
                 value={formData.fechaLimite}
                 onChange={handleChange}

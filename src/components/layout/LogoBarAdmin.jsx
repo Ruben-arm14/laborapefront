@@ -26,9 +26,6 @@ const LogoBarAdmin = () => {
           <li className={router.pathname === '/trabajosadmin' ? styles.active : ''}>
             <a href="http://localhost:3000/trabajosadmin">Trabajos Enviados</a>
           </li>
-          <li className={router.pathname === '/propuestasadmin' ? styles.active : ''}>
-            <a href="http://localhost:3000/propuestasadmin">Propuestas Enviadas</a>
-          </li>
         </ul>
       </nav>
       <div className={styles.userActions}>

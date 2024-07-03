@@ -126,3 +126,16 @@
 .navbar {
   width: 100%;
 }
+
+/* CSS para deshabilitar días en el calendario */
+.dateInput {
+  color: #000;
+}
+
+.dateInput::-webkit-datetime-edit-fields-wrapper {
+  background: #f0f0f0;
+}
+
+.dateInput:invalid {
+  color: #d3d3d3; /* Color gris para fechas no válidas */
+}

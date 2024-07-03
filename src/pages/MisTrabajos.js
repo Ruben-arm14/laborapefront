@@ -8,7 +8,7 @@ import Pagination from '@mui/material/Pagination';
 import styles from '@/styles/global/misTrabajos.module.css';
 
 const MisTrabajos = () => {
-  const { user } = useContext(AppContext);
+  const { user, setUser } = useContext(AppContext);
   const [trabajos, setTrabajos] = useState([]);
   const [error, setError] = useState(null);
   const [trabajoSeleccionado, setTrabajoSeleccionado] = useState(null);
@@ -17,13 +17,30 @@ const MisTrabajos = () => {
   const itemsPerPage = 4;
 
   useEffect(() => {
+    const storedUser = sessionStorage.getItem('usuario');
+    if (storedUser) {
+      const parsedUser = JSON.parse(storedUser);
+      setUser(parsedUser);
+    }
+  }, [setUser]);
+
+  useEffect(() => {
     const fetchTrabajos = async () => {
       if (!user) {
         setError("Debes iniciar sesión para ver tus trabajos.");
         return;
       }
+
       try {
-        const response = await fetch(`http://localhost:8080/trabajos/estado/${estadoFiltro}`);
+        // Asumimos que user.idusuario es el ID del usuario
+        // Se debe obtener el clienteId basado en el idusuario
+        const responseCliente = await fetch(`http://localhost:8080/clientes/usuario/${user.idusuario}`);
+        if (!responseCliente.ok) {
+          throw new Error("Error al obtener cliente");
+        }
+        const cliente = await responseCliente.json();
+
+        const response = await fetch(`http://localhost:8080/trabajos/estado/${estadoFiltro}?clienteId=${cliente.idcliente}`);
         if (!response.ok) {
           throw new Error("Error HTTP! status: " + response.status);
         }
@@ -34,7 +51,9 @@ const MisTrabajos = () => {
       }
     };
 
-    fetchTrabajos();
+    if (user) {
+      fetchTrabajos();
+    }
   }, [user, estadoFiltro]);
 
   const handleEdit = (trabajo) => {
@@ -53,6 +72,51 @@ const MisTrabajos = () => {
     } catch (err) {
       setError(err.message);
     }
+  };
+
+  const handleContact = async (idfreelancer) => {
+    try {
+      const response = await fetch(`http://localhost:8080/freelancers/${idfreelancer}`);
+      if (!response.ok) {
+        throw new Error("Error HTTP! status: " + response.status);
+      }
+      const data = await response.json();
+      // manejar la lógica de los contactos aquí
+    } catch (err) {
+      setError(err.message);
+    }
+  };
+
+  const handleAccept = async (idtrabajo) => {
+    try {
+      const response = await fetch(`http://localhost:8080/trabajos/${idtrabajo}/aceptar`, {
+        method: 'PUT'
+      });
+      if (!response.ok) {
+        throw new Error("Error HTTP! status: " + response.status);
+      }
+      // Actualizar el estado de los trabajos aquí
+    } catch (err) {
+      setError(err.message);
+    }
+  };
+
+  const handleFinalize = async (idtrabajo) => {
+    try {
+      const response = await fetch(`http://localhost:8080/trabajos/${idtrabajo}/finalizar`, {
+        method: 'PUT'
+      });
+      if (!response.ok) {
+        throw new Error("Error HTTP! status: " + response.status);
+      }
+      // Actualizar el estado de los trabajos aquí
+    } catch (err) {
+      setError(err.message);
+    }
+  };
+
+  const handleRate = (idtrabajo) => {
+    // lógica para calificar el trabajo
   };
 
   const closeModal = () => {
@@ -83,14 +147,17 @@ const MisTrabajos = () => {
             label="Estado"
           >
             <MenuItem value="EN_REVISION">En Revisión</MenuItem>
-            <MenuItem value="APROBADO">Aprobado</MenuItem>
             <MenuItem value="RECHAZADO">Rechazado</MenuItem>
-            <MenuItem value="COMPLETADO">Completado</MenuItem>
+            <MenuItem value="PUBLICADO">Publicado</MenuItem>
+            <MenuItem value="ACEPTADO">Aceptado</MenuItem>
+            <MenuItem value="EN_PROCESO">En Proceso</MenuItem>
+            <MenuItem value="FINALIZADO">Finalizado</MenuItem>
           </Select>
         </FormControl>
       </div>
       <Box className={styles.trabajosContainer}>
-        {error && user == null && <Alert severity="error">{error}</Alert>}
+        {error && <Alert severity="error">{error}</Alert>}
+        {trabajos.length === 0 && !error && <Alert severity="info">Por el momento no tienes trabajos con ese estado.</Alert>}
         <div className={styles.cardContainer}>
           {paginatedTrabajos.map((trabajo) => (
             <MisTrabajosCard
@@ -98,6 +165,10 @@ const MisTrabajos = () => {
               trabajo={trabajo}
               onEdit={handleEdit}
               onDelete={handleDelete}
+              onContact={handleContact}
+              onAccept={handleAccept}
+              onFinalize={handleFinalize}
+              onRate={handleRate}
             />
           ))}
         </div>
