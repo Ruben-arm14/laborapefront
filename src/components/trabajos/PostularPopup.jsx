@@ -1,32 +1,37 @@
 import React, { useState, useEffect } from 'react';
-import { Dialog, DialogTitle, DialogContent, DialogActions, Button, TextField, Typography, Box } from '@mui/material';
+import { Dialog, DialogTitle, DialogContent, DialogActions, Button, TextField, Typography, Box, FormControl, InputLabel, Select, MenuItem } from '@mui/material';
 
 const PostularPopup = ({ open, onClose, trabajo, freelancer, onPostular }) => {
   const [mensaje, setMensaje] = useState('');
   const [presupuesto, setPresupuesto] = useState('');
+  const [disponibilidad, setDisponibilidad] = useState('');
 
   useEffect(() => {
     if (trabajo) {
       setMensaje('');
       setPresupuesto('');
+      setDisponibilidad('');
     }
   }, [trabajo]);
 
   const handlePostular = async () => {
+    // Añadir logs para confirmar valores
+    console.log("Trabajo ID:", trabajo?.idtrabajo);
+    console.log("Cliente ID:", trabajo?.idcliente);
+    console.log("Freelancer ID:", freelancer?.idfreelancer);
+
     if (!trabajo || !trabajo.idtrabajo || !trabajo.idcliente || !freelancer || !freelancer.idfreelancer) {
         alert("El trabajo, el cliente o el freelancer no están definidos.");
-        console.log("Trabajo:", trabajo);
-        console.log("Cliente:", trabajo ? trabajo.idcliente : "N/A");
-        console.log("Freelancer:", freelancer);
         return;
     }
 
     const postulacion = {
-        trabajoId: trabajo.idtrabajo,
-        clienteId: trabajo.idcliente,
-        freelancerId: freelancer.idfreelancer,
+        trabajo: { idtrabajo: trabajo.idtrabajo },
+        cliente: { idcliente: trabajo.idcliente },
+        freelancer: { idfreelancer: freelancer.idfreelancer },
         mensaje: mensaje,
-        presupuesto: parseFloat(presupuesto)
+        presupuesto: parseFloat(presupuesto),
+        disponibilidad: disponibilidad
     };
 
     console.log("Postulación a enviar (objeto):", postulacion);
@@ -68,6 +73,17 @@ const PostularPopup = ({ open, onClose, trabajo, freelancer, onPostular }) => {
         <Typography variant="body1" gutterBottom>{trabajo?.descripcion}</Typography>
         <Typography variant="body2" color="textSecondary" gutterBottom>Ubicación: {trabajo?.ubicacion}</Typography>
         <Typography variant="body2" color="textSecondary" gutterBottom>Fecha Límite: {trabajo?.fechaLimite}</Typography>
+        <FormControl fullWidth margin="dense">
+          <InputLabel>Disponibilidad</InputLabel>
+          <Select
+            value={disponibilidad}
+            onChange={(e) => setDisponibilidad(e.target.value)}
+          >
+            <MenuItem value="mañana">Mañana</MenuItem>
+            <MenuItem value="tarde">Tarde</MenuItem>
+            <MenuItem value="noche">Noche</MenuItem>
+          </Select>
+        </FormControl>
         <TextField
           autoFocus
           margin="dense"

@@ -6,7 +6,7 @@ import styles from '@/styles/global/trabajosFreelancer.module.css';
 import PostularPopup from '@/components/trabajos/PostularPopup';
 
 const TrabajosFreelancer = () => {
-  const { user } = useContext(AppContext);
+  const { user, setUser } = useContext(AppContext);
   const [trabajos, setTrabajos] = useState([]);
   const [error, setError] = useState(null);
   const [open, setOpen] = useState(false);
@@ -31,7 +31,38 @@ const TrabajosFreelancer = () => {
     fetchTrabajos();
   }, []);
 
+  useEffect(() => {
+    if (!user || !user.idusuario) return;
+
+    const fetchFreelancerProfile = async () => {
+      try {
+        const response = await fetch(`http://localhost:8080/usuarios/perfilfreelancer/${user.idusuario}`);
+        if (!response.ok) {
+          throw new Error("Error al obtener el perfil del freelancer");
+        }
+        const data = await response.json();
+        console.log("Perfil del freelancer:", data);
+        setUser(prevUser => ({
+          ...prevUser,
+          habilidades: data.habilidades,
+          idfreelancer: data.idfreelancer
+        }));
+      } catch (err) {
+        setError(err.message);
+      }
+    };
+
+    fetchFreelancerProfile();
+  }, [user && user.idusuario, setUser]); // Asegurarse de que el user.idusuario sea evaluado correctamente
+
+  
   const handleOpen = (trabajo) => {
+    // Verificar si el freelancer tiene habilidades
+    if (!user.habilidades || user.habilidades.trim() === "") {
+      alert("Antes de postular debes llenar tus HABILIDADES en la sección de perfil");
+      return;
+    }
+    console.log("Abriendo postulación para el trabajo:", trabajo);
     setSelectedTrabajo(trabajo);
     setOpen(true);
   };
@@ -42,6 +73,8 @@ const TrabajosFreelancer = () => {
   };
 
   const handlePostular = async () => {
+    console.log("Postulando al trabajo:", selectedTrabajo);
+    console.log("Datos del freelancer:", user);
     const updatedTrabajos = trabajos.filter(trabajo => trabajo.idtrabajo !== selectedTrabajo.idtrabajo);
     setTrabajos(updatedTrabajos);
     handleClose();
