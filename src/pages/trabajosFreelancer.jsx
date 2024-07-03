@@ -17,7 +17,7 @@ const TrabajosFreelancer = () => {
   useEffect(() => {
     const fetchTrabajos = async () => {
       try {
-        const response = await fetch('http://localhost:8080/trabajos/estado/APROBADO'); // Solo trabajos aprobados
+        const response = await fetch('http://localhost:8080/trabajos/estado/PUBLICADO'); // Solo trabajos publicados
         if (!response.ok) {
           throw new Error("Error HTTP! status: " + response.status);
         }
@@ -42,7 +42,6 @@ const TrabajosFreelancer = () => {
   };
 
   const handlePostular = async () => {
-    // Filtrar los trabajos para eliminar el trabajo seleccionado después de postular
     const updatedTrabajos = trabajos.filter(trabajo => trabajo.idtrabajo !== selectedTrabajo.idtrabajo);
     setTrabajos(updatedTrabajos);
     handleClose();
@@ -73,6 +72,7 @@ const TrabajosFreelancer = () => {
                   <Typography variant="body2" className={styles.trabajoPresupuestoFreelancer}>Presupuesto: {trabajo.presupuesto}</Typography>
                   <Typography variant="body2" className={styles.trabajoClienteFreelancer}>Cliente: {trabajo.nombreCliente || 'Desconocido'}</Typography>
                   <Typography variant="body2" className={styles.trabajoUbicacionFreelancer}>Ubicación: {trabajo.ubicacion}</Typography>
+                  <Typography variant="body2" className={styles.trabajoFechaLimiteFreelancer}>Fecha Límite: {new Date(trabajo.fechaLimite).toLocaleString()}</Typography>
                   <button className={styles.postularButtonFreelancer} onClick={() => handleOpen(trabajo)}>POSTULAR</button>
                 </div>
               </Grid>
@@ -91,7 +91,7 @@ const TrabajosFreelancer = () => {
           open={open}
           onClose={handleClose}
           trabajo={selectedTrabajo}
-          freelancer={user} // Pasamos el objeto completo del usuario
+          freelancer={user}
           onPostular={handlePostular}
         />
       )}
