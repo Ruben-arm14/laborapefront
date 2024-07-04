@@ -35,7 +35,14 @@ const Historial = () => {
     setFiltro(newValue);
   };
 
-  const filteredHistorial = historial.filter(item => filtro === 'todos' || item.estado === filtro);
+  // Filtrar propuestas para mostrar solo las que están en los estados EN_PROCESO y TERMINADO
+  const filteredHistorial = historial.filter(item =>
+    filtro === 'todos'
+      ? item.estado === 'EN_PROCESO' || item.estado === 'TERMINADO'
+      : item.estado === filtro
+  );
+
+  const getCountByState = (state) => historial.filter(item => item.estado === state).length;
 
   if (loading) return <p>Cargando...</p>;
   if (error) return <p>Error: {error}</p>;
@@ -45,9 +52,9 @@ const Historial = () => {
       <LogoBarFreelance />
       <h1 className={styles.title}>Historial</h1>
       <Tabs value={filtro} onChange={handleFiltroChange} className={styles.tabs}>
-        <Tab label="Todos" value="todos" />
-        <Tab label="En Proceso" value="EN_PROCESO" />
-        <Tab label="Terminado" value="TERMINADO" />
+        <Tab label={`Todos (${getCountByState('EN_PROCESO') + getCountByState('TERMINADO')})`} value="todos" />
+        <Tab label={`En Proceso (${getCountByState('EN_PROCESO')})`} value="EN_PROCESO" />
+        <Tab label={`Terminado (${getCountByState('TERMINADO')})`} value="TERMINADO" />
       </Tabs>
       <Box className={styles.historialContainer}>
         <Grid container spacing={2} direction="column">

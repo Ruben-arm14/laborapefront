@@ -12,7 +12,7 @@ const TrabajosFreelancer = () => {
   const [open, setOpen] = useState(false);
   const [selectedTrabajo, setSelectedTrabajo] = useState(null);
   const [page, setPage] = useState(1);
-  const [rowsPerPage] = useState(4);
+  const [rowsPerPage] = useState(5); // Cambié el valor a 5
 
   useEffect(() => {
     const fetchTrabajos = async () => {
@@ -121,20 +121,26 @@ const TrabajosFreelancer = () => {
         <Box className={styles.trabajosContainerFreelancer}>
           {error && <Alert severity="error">{error}</Alert>}
           <Grid container spacing={4} justifyContent="center">
-            {currentTrabajos.map((trabajo, index) => (
-              <Grid item key={index} className={styles.trabajoItemFreelancer}>
-                <div className={styles.trabajoDetailsFreelancer}>
-                  <img src={`http://localhost:8080/trabajos/${trabajo.idtrabajo}/imagen`} alt={trabajo.titulo} className={styles.trabajoImageFreelancer} />
-                  <Typography variant="h6" className={styles.trabajoTitulo}>{trabajo.titulo}</Typography>
-                  <Typography variant="body1" className={styles.trabajoDescripcionFreelancer}>{trabajo.descripcion}</Typography>
-                  <Typography variant="body2" className={styles.trabajoPresupuestoFreelancer}>Presupuesto: {trabajo.presupuesto}</Typography>
-                  <Typography variant="body2" className={styles.trabajoClienteFreelancer}>Cliente: {trabajo.nombreCliente || 'Desconocido'}</Typography>
-                  <Typography variant="body2" className={styles.trabajoUbicacionFreelancer}>Ubicación: {trabajo.ubicacion}</Typography>
-                  <Typography variant="body2" className={styles.trabajoFechaLimiteFreelancer}>Fecha Límite: {new Date(trabajo.fechaLimite).toLocaleString()}</Typography>
-                  <button className={styles.postularButtonFreelancer} onClick={() => handleOpen(trabajo)}>POSTULAR</button>
-                </div>
-              </Grid>
-            ))}
+            {currentTrabajos.length > 0 ? (
+              currentTrabajos.map((trabajo, index) => (
+                <Grid item key={index} className={styles.trabajoItemFreelancer}>
+                  <div className={styles.trabajoDetailsFreelancer}>
+                    <img src={`http://localhost:8080/trabajos/${trabajo.idtrabajo}/imagen`} alt={trabajo.titulo} className={styles.trabajoImageFreelancer} />
+                    <Typography variant="h6" className={styles.trabajoTitulo}>{trabajo.titulo}</Typography>
+                    <Typography variant="body1" className={styles.trabajoDescripcionFreelancer}>{trabajo.descripcion}</Typography>
+                    <Typography variant="body2" className={styles.trabajoPresupuestoFreelancer}>Presupuesto: {trabajo.presupuesto}</Typography>
+                    <Typography variant="body2" className={styles.trabajoClienteFreelancer}>Cliente: {trabajo.nombreCliente || 'Desconocido'}</Typography>
+                    <Typography variant="body2" className={styles.trabajoUbicacionFreelancer}>Ubicación: {trabajo.ubicacion}</Typography>
+                    <Typography variant="body2" className={styles.trabajoFechaLimiteFreelancer}>Fecha Límite: {new Date(trabajo.fechaLimite).toLocaleString()}</Typography>
+                    <button className={styles.postularButtonFreelancer} onClick={() => handleOpen(trabajo)}>POSTULAR</button>
+                  </div>
+                </Grid>
+              ))
+            ) : (
+              <Alert severity="info" className={styles.noTrabajosMessage}>
+                Por el momento no hay trabajos disponibles.
+              </Alert>
+            )}
           </Grid>
         </Box>
         <Pagination

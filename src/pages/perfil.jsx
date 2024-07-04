@@ -4,6 +4,8 @@ import { AppContext } from '@/context/AppContext';
 import styles from '@/styles/global/perfil.module.css';
 import LogoBarFreelance from '@/components/layout/LogoBarFreelance';
 import { useRouter } from 'next/router';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const Perfil = () => {
   const { user, setUser } = useContext(AppContext);
@@ -56,9 +58,7 @@ const Perfil = () => {
             });
         })
         .catch(error => console.error("Error al obtener el perfil:", error));
-}, [user]);
-
-  
+  }, [user]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -97,7 +97,7 @@ const Perfil = () => {
       console.log("Respuesta del servidor:", data);
       setPerfil(formPerfil);
       setEditMode(false);
-      alert("Los datos fueron guardados correctamente.");
+      toast.success("Se guardo correctamente tus datos");
       // Recargar el perfil
       return fetch(`http://localhost:8080/usuarios/perfil/${user.idusuario}`);
     })
@@ -122,11 +122,10 @@ const Perfil = () => {
     })
     .catch(error => {
       console.error("Error al guardar el perfil:", error);
-      alert("Hubo un error al guardar el perfil. Por favor, intenta nuevamente.");
+      toast.error("Hubo un error al guardar el perfil. Por favor, intenta nuevamente.");
     });
   };
-  
-  
+
   const handleEditarPerfil = () => {
     setEditMode(true);
   };
@@ -145,7 +144,6 @@ const Perfil = () => {
         reader.readAsDataURL(file);
     }
   };
-  
 
   if (!perfil) {
     return <div>Cargando...</div>;
@@ -172,7 +170,7 @@ const Perfil = () => {
             </Button>
           </>
         ) : (
-          <form className={styles.form}>
+          <form className={styles.editForm}>
             <TextField
               label="Nombre"
               name="nombre"
@@ -262,6 +260,7 @@ const Perfil = () => {
           </form>
         )}
       </Box>
+      <ToastContainer />
     </div>
   );
 };

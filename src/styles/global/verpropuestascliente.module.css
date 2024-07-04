@@ -1,0 +1,84 @@
+.bodyNoMargin {
+  margin: 0;
+  padding-top: 100px; /* Ajustar según la altura de la barra de navegación */
+  background-color: #f4f4f9;
+}
+
+.pageContainer {
+  padding: 20px;
+}
+
+.subtitle {
+  text-align: center;
+  margin-bottom: 40px;
+  font-size: 2em;
+  font-weight: bold;
+  color: #333;
+}
+
+.propuestasWrapper {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding-top: 100px;
+  text-align: center;
+}
+
+.propuestaItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 60px 0; /* Ajustar este margen superior para mover la tarjeta más abajo */
+  padding: 20px;
+  border: 1px solid #ddd;
+  border-radius: 12px;
+  background-color: #fff;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.propuestaItem:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+.freelancerInfo {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.freelancerImageWrapper {
+  margin-right: 20px;
+}
+
+.freelancerImage {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.freelancerDetails {
+  text-align: left;
+  padding-left: 50px;
+}
+
+.trabajoDetails {
+  text-align: left;
+  padding-left: 100px;
+  margin-bottom: 20px;
+}
+
+.buttonsContainer {
+  display: flex;
+  gap: 10px;
+  margin-left: 200px;
+}
+
+.buttonsContainer Button {
+  margin: 5px;
+}
+
+.freelancerDetails p, .trabajoDetails p {
+  margin: 5px 0;
+}

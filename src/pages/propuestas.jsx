@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useContext } from 'react';
-import { Box, Grid, Alert, Button, Snackbar, Typography, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@mui/material';
+import { Box, Grid, Alert, Button, Snackbar, Typography, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Tabs, Tab, Pagination } from '@mui/material';
 import LogoBarFreelance from '@/components/layout/LogoBarFreelance';
 import { AppContext } from '@/context/AppContext';
 import styles from '@/styles/global/verPropuestas.module.css';
@@ -10,7 +10,12 @@ const Propuestas = () => {
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(false);
   const [open, setOpen] = useState(false);
+  const [confirmationOpen, setConfirmationOpen] = useState(false);
   const [clienteInfo, setClienteInfo] = useState(null);
+  const [currentPropuestaId, setCurrentPropuestaId] = useState(null);
+  const [filter, setFilter] = useState('Todos');
+  const [page, setPage] = useState(1);
+  const itemsPerPage = 5;
 
   useEffect(() => {
     if (!user || !user.idfreelancer) {
@@ -35,7 +40,6 @@ const Propuestas = () => {
   }, [user]);
 
   const handleCancel = async (propuestaId) => {
-    console.log(`Eliminando postulación con ID: ${propuestaId}`);
     try {
       const response = await fetch(`http://localhost:8080/postulaciones/${propuestaId}`, {
         method: 'DELETE',
@@ -50,20 +54,29 @@ const Propuestas = () => {
     }
   };
 
-  const handleViewContact = async (clienteId) => {
-    if (!clienteId) {
-      setError("ID de cliente no encontrado.");
-      return;
-    }
-    console.log("Cliente ID:", clienteId);
+  const handleViewContact = async (propuesta) => {
     try {
-      const response = await fetch(`http://localhost:8080/postulaciones/cliente/${clienteId}/detalle`);
+      const response = await fetch(`http://localhost:8080/postulaciones/cliente/${propuesta.trabajo.cliente.idcliente}/detalle`);
       if (!response.ok) {
-        throw new Error("Error HTTP! status: " + response.status);
+        throw new Error('Failed to fetch client details');
       }
-      const data = await response.json();
-      setClienteInfo(data);
+      const clienteData = await response.json();
+      setClienteInfo(clienteData);
+      setCurrentPropuestaId(propuesta.id);
       setOpen(true);
+
+      // Update the state to "EN_PROCESO"
+      const updateResponse = await fetch(`http://localhost:8080/postulaciones/${propuesta.id}/actualizar-estado`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ estado: 'EN_PROCESO' }),
+      });
+      if (!updateResponse.ok) {
+        throw new Error('Failed to update proposal status');
+      }
+
+      // Update the local state
+      setPropuestas(propuestas.map(p => p.id === propuesta.id ? { ...p, estado: 'EN_PROCESO' } : p));
     } catch (err) {
       setError(err.message);
     }
@@ -72,13 +85,41 @@ const Propuestas = () => {
   const handleClose = () => {
     setOpen(false);
     setClienteInfo(null);
+    setConfirmationOpen(true); // Show the confirmation message
   };
+
+  const filteredPropuestas = propuestas.filter(propuesta => {
+    if (filter === 'Todos') {
+      return propuesta.estado !== 'EN_PROCESO' && propuesta.estado !== 'TERMINADO';
+    }
+    return propuesta.estado === filter;
+  });
+
+  const handleFilterChange = (event, newValue) => {
+    setFilter(newValue);
+    setPage(1); // Reset page to 1 when filter changes
+  };
+
+  const getCountByState = (state) => propuestas.filter(propuesta => propuesta.estado === state).length;
+
+  const paginatedPropuestas = filteredPropuestas.slice((page - 1) * itemsPerPage, page * itemsPerPage);
 
   return (
     <>
       <LogoBarFreelance />
       <div className={styles.container}>
         <h1 className={styles.title}>Mis Postulaciones</h1>
+        <Tabs
+          value={filter}
+          onChange={handleFilterChange}
+          className={styles.tabs}
+          centered
+        >
+          <Tab label={`Todos (${propuestas.filter(p => p.estado !== 'EN_PROCESO' && p.estado !== 'TERMINADO').length})`} value="Todos" />
+          <Tab label={`Pendiente (${getCountByState('PENDIENTE')})`} value="PENDIENTE" />
+          <Tab label={`Aceptado (${getCountByState('ACEPTADO')})`} value="ACEPTADO" />
+          <Tab label={`Rechazado (${getCountByState('RECHAZADO')})`} value="RECHAZADO" />
+        </Tabs>
         <Box className={styles.propuestasWrapper}>
           {error && <Alert severity="error">{error}</Alert>}
           <Snackbar
@@ -87,9 +128,15 @@ const Propuestas = () => {
             onClose={() => setSuccess(false)}
             message="Postulación eliminada correctamente"
           />
+          <Snackbar
+            open={confirmationOpen}
+            autoHideDuration={6000}
+            onClose={() => setConfirmationOpen(false)}
+            message="Ahora el trabajo lo podrás ver en la sección de historial."
+          />
           <Grid container spacing={2} justifyContent="center">
-            {propuestas.length > 0 ? (
-              propuestas.map((propuesta, index) => (
+            {paginatedPropuestas.length > 0 ? (
+              paginatedPropuestas.map((propuesta, index) => (
                 <Grid item key={index} className={styles.propuestaItem}>
                   <div className={styles.propuestaDetails}>
                     {propuesta.trabajo.imagen ? (
@@ -112,7 +159,7 @@ const Propuestas = () => {
                         variant="contained"
                         color="primary"
                         className={styles.contactButton}
-                        onClick={() => handleViewContact(propuesta.trabajo.cliente.idusuario)}
+                        onClick={() => handleViewContact(propuesta)}
                       >
                         VER CONTACTO DEL CLIENTE
                       </Button>
@@ -130,9 +177,19 @@ const Propuestas = () => {
                 </Grid>
               ))
             ) : (
-              <Typography>No hay postulaciones enviadas.</Typography>
+              <Alert severity="info" className={styles.noPostulationsMessage}>
+                No hay postulaciones con este estado.
+              </Alert>
             )}
           </Grid>
+          {filteredPropuestas.length > itemsPerPage && (
+            <Pagination
+              count={Math.ceil(filteredPropuestas.length / itemsPerPage)}
+              page={page}
+              onChange={(e, newPage) => setPage(newPage)}
+              className={styles.pagination}
+            />
+          )}
         </Box>
       </div>
       <Dialog open={open} onClose={handleClose}>

@@ -1,7 +1,11 @@
-.title {
+.container {
   text-align: center;
-  margin-top: 50px; /* Reducir el margen superior */
-  font-size: 24px;
+  padding-top: 50px;
+}
+
+.title {
+  font-size: 40px;
+  margin-bottom: 50px;
 }
 
 .filterContainer {
@@ -20,15 +24,15 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin-bottom: 50px; /* Añadir margen inferior */
+  margin-bottom: 50px; 
 }
 
-.gridItem {
+.trabajoItem {
   margin-bottom: 20px;
 }
 
-.paginationContainer {
-  margin-top: 30px; /* Aumentar margen superior */
+.pagination {
+  margin-top: 30px; 
   display: flex;
   justify-content: center;
 }
@@ -40,15 +44,10 @@
   gap: 20px;
 }
 
-.modal {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 80%;
-  max-width: 600px;
-  background-color: white;
-  border-radius: 10px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+.noTrabajosMessage {
+  margin-top: 20px;
   padding: 20px;
+  font-size: 16px;
+  color: #555;
+  text-align: center;
 }

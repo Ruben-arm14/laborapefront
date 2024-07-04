@@ -1,12 +1,15 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { useRouter } from 'next/router';
+import { AppContext } from '@/context/AppContext';
 import styles from '@/styles/global/LogoBarFreelance.module.css';
 
 const LogoBarFreelance = () => {
+  const { setUser } = useContext(AppContext);
   const router = useRouter();
 
   const handleLogout = () => {
-    // Logic for logging out
+    setUser(null);
+    localStorage.removeItem('usuario');
     router.push('/login');
   };
 
@@ -15,7 +18,7 @@ const LogoBarFreelance = () => {
       <div className={styles.logo}>
         <img src={`/imagenes/Labora.png`} className={styles.logoImage} />
       </div>
-      <nav>
+      <nav className={styles.nav}>
         <ul className={styles.navList}>
           <li className={`${styles.navItem} ${router.pathname === '/trabajosFreelancer' ? styles.active : ''}`}>
             <a onClick={() => router.push('/trabajosFreelancer')}>Trabajos</a>
@@ -32,7 +35,7 @@ const LogoBarFreelance = () => {
         </ul>
       </nav>
       <div className={styles.userActions}>
-        <button onClick={handleLogout} className={styles.logoutButton}>Cerrar Sesión</button>
+        <a href="#" onClick={handleLogout} className={styles.logoutButton}>Cerrar Sesión</a>
       </div>
     </div>
   );

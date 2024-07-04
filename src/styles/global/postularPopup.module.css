@@ -4,32 +4,33 @@
     max-width: 600px;
     margin: auto;
 }
-  
+
 .dialogTitle {
     text-align: center;
     font-size: 24px;
     font-weight: bold;
     color: #333;
 }
-  
+
 .dialogContent {
     text-align: center;
     padding: 20px;
 }
-  
+
 .trabajoImage {
     width: 100%;
+    max-width: 300px; /* Tamaño máximo para la imagen */
     height: auto;
     border-radius: 10px;
     margin-bottom: 10px;
 }
-  
+
 .trabajoTitulo {
     font-size: 20px;
     font-weight: bold;
     margin-bottom: 10px;
 }
-  
+
 .trabajoDescripcion,
 .trabajoUbicacion,
 .trabajoFechaLimite {
@@ -37,17 +38,17 @@
     color: #555;
     margin-bottom: 10px;
 }
-  
+
 .presupuestoInput, .mensajeInput {
     margin-top: 20px;
 }
-  
+
 .dialogActions {
     display: flex;
     justify-content: space-between;
     padding: 10px 20px;
 }
-  
+
 .cancelButton {
     background-color: #ccc;
     color: black;
@@ -56,7 +57,7 @@
     cursor: pointer;
     font-size: 14px;
 }
-  
+
 .postularButton {
     background-color: #007bff;
     color: white;

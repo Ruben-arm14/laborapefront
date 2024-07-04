@@ -1,63 +1,86 @@
 .container {
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 20px;
-    overflow-y: auto; /* Permite el scroll vertical */
-    height: 100vh; /* Ajusta la altura del contenedor para ocupar toda la pantalla */
-  }
-  
-  .title {
-    font-size: 2.5rem;
-    margin-bottom: 20px;
-  }
-  
-  .tabs {
-    margin-bottom: 20px;
-  }
-  
-  .historialContainer {
-    width: 100%;
-    max-width: 1200px;
-  }
-  
-  .historialItem {
-    background-color: white;
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    overflow: hidden;
-    padding: 20px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 20px;
-  }
-  
-  .trabajoImage {
-    width: 100px;
-    height: 100px;
-    border-radius: 8px;
-    object-fit: cover;
-    margin-right: 20px;
-  }
-  
-  .historialDetails {
-    flex-grow: 1;
-    margin-right: 20px;
-  }
-  
-  .resenaButton {
-    background-color: #007bff;
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 14px;
-  }
-  
-  .resenaButton:hover {
-    background-color: #0056b3;
-  }
-  
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+  overflow-y: auto; /* Permite el scroll vertical */
+  height: 100vh; /* Ajusta la altura del contenedor para ocupar toda la pantalla */
+  background-color: #f4f4f9; /* Fondo claro para un mejor contraste */
+}
+
+.title {
+  font-size: 2.5rem;
+  padding-top: 70px;
+  margin-bottom: 30px;
+  color: #333; /* Color de texto oscuro para el título */
+}
+
+.tabs {
+  margin-bottom: 40px;
+  background-color: #fff; /* Fondo blanco para las pestañas */
+  border-radius: 8px; /* Bordes redondeados */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Sombra sutil */
+}
+
+.historialContainer {
+  width: 100%;
+  max-width: 1200px;
+}
+
+.historialItem {
+  background-color: white;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  transition: transform 0.3s, box-shadow 0.3s; /* Transiciones suaves */
+}
+
+.historialItem:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15); /* Sombra más intensa al hacer hover */
+}
+
+.trabajoImage {
+  width: 100px;
+  height: 100px;
+  border-radius: 8px;
+  object-fit: cover;
+  margin-right: 20px;
+}
+
+.historialDetails {
+  flex-grow: 1;
+  margin-right: 20px;
+  color: #666; /* Color de texto gris para los detalles */
+}
+
+.historialDetails h2 {
+  font-size: 1.5rem;
+  margin-bottom: 10px;
+  color: #333; /* Color de texto oscuro para el título del trabajo */
+}
+
+.historialDetails p {
+  margin-bottom: 5px;
+}
+
+.resenaButton {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.3s; /* Transición suave */
+}
+
+.resenaButton:hover {
+  background-color: #0056b3; /* Color más oscuro al hacer hover */
+}

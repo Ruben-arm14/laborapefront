@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Dialog, DialogTitle, DialogContent, DialogActions, Button, TextField, Typography, Box, FormControl, InputLabel, Select, MenuItem } from '@mui/material';
+import { toast } from 'react-toastify';
 
 const PostularPopup = ({ open, onClose, trabajo, freelancer, onPostular }) => {
   const [mensaje, setMensaje] = useState('');
@@ -15,64 +16,55 @@ const PostularPopup = ({ open, onClose, trabajo, freelancer, onPostular }) => {
   }, [trabajo]);
 
   const handlePostular = async () => {
-    // Añadir logs para confirmar valores
-    console.log("Trabajo ID:", trabajo?.idtrabajo);
-    console.log("Cliente ID:", trabajo?.idcliente);
-    console.log("Freelancer ID:", freelancer?.idfreelancer);
-
     if (!trabajo || !trabajo.idtrabajo || !trabajo.idcliente || !freelancer || !freelancer.idfreelancer) {
-        alert("El trabajo, el cliente o el freelancer no están definidos.");
-        return;
+      toast.error("El trabajo, el cliente o el freelancer no están definidos.");
+      return;
     }
 
     const postulacion = {
-        trabajo: { idtrabajo: trabajo.idtrabajo },
-        cliente: { idcliente: trabajo.idcliente },
-        freelancer: { idfreelancer: freelancer.idfreelancer },
-        mensaje: mensaje,
-        presupuesto: parseFloat(presupuesto),
-        disponibilidad: disponibilidad
+      trabajo: { idtrabajo: trabajo.idtrabajo },
+      cliente: { idcliente: trabajo.idcliente },
+      freelancer: { idfreelancer: freelancer.idfreelancer },
+      mensaje: mensaje,
+      presupuesto: parseFloat(presupuesto),
+      disponibilidad: disponibilidad
     };
 
-    console.log("Postulación a enviar (objeto):", postulacion);
-
     try {
-        const postulacionJSON = JSON.stringify(postulacion);
-        console.log("Postulación a enviar (JSON):", postulacionJSON);
+      const postulacionJSON = JSON.stringify(postulacion);
+      const response = await fetch('http://localhost:8080/postulaciones', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: postulacionJSON,
+      });
 
-        const response = await fetch('http://localhost:8080/postulaciones', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: postulacionJSON,
-        });
-
-        if (response.ok) {
-            alert("Solicitud enviada");
-            onPostular(); // Call the function to refresh the list of jobs
-            onClose();
-        } else {
-            const errorData = await response.json();
-            alert(`Error: ${errorData.error}`);
-        }
+      if (response.ok) {
+        toast.success("Solicitud enviada");
+        onPostular(); // Call the function to refresh the list of jobs
+        onClose();
+      } else {
+        const errorData = await response.json();
+        toast.error(`Error: ${errorData.error}`);
+      }
     } catch (error) {
-        alert(`Error: ${error.message}`);
+      toast.error(`Error: ${error.message}`);
     }
-};
+  };
 
   return (
-    <Dialog open={open} onClose={onClose}>
-      <DialogTitle>Postular a {trabajo?.titulo}</DialogTitle>
-      <DialogContent>
+    <Dialog open={open} onClose={onClose} classes={{ paper: 'dialogPaper' }}>
+      <DialogTitle className="dialogTitle">Postular a {trabajo?.titulo}</DialogTitle>
+      <DialogContent className="dialogContent">
         <Box mb={2} display="flex" justifyContent="center">
-          <img src={`http://localhost:8080/trabajos/${trabajo?.idtrabajo}/imagen`} alt={trabajo?.titulo} style={{ width: '100%', maxHeight: '200px', objectFit: 'cover', borderRadius: '8px' }} />
+          <img src={`http://localhost:8080/trabajos/${trabajo?.idtrabajo}/imagen`} alt={trabajo?.titulo} className="trabajoImage" />
         </Box>
-        <Typography variant="h6">{trabajo?.titulo}</Typography>
+        <Typography variant="h6" className="trabajoTitulo">{trabajo?.titulo}</Typography>
         <Typography variant="body2" color="textSecondary" gutterBottom>{trabajo?.nombreCliente || 'Desconocido'}</Typography>
-        <Typography variant="body1" gutterBottom>{trabajo?.descripcion}</Typography>
-        <Typography variant="body2" color="textSecondary" gutterBottom>Ubicación: {trabajo?.ubicacion}</Typography>
-        <Typography variant="body2" color="textSecondary" gutterBottom>Fecha Límite: {trabajo?.fechaLimite}</Typography>
+        <Typography variant="body1" gutterBottom className="trabajoDescripcion">{trabajo?.descripcion}</Typography>
+        <Typography variant="body2" color="textSecondary" gutterBottom className="trabajoUbicacion">Ubicación: {trabajo?.ubicacion}</Typography>
+        <Typography variant="body2" color="textSecondary" gutterBottom className="trabajoFechaLimite">Fecha Límite: {trabajo?.fechaLimite}</Typography>
         <FormControl fullWidth margin="dense">
           <InputLabel>Disponibilidad</InputLabel>
           <Select
@@ -92,6 +84,7 @@ const PostularPopup = ({ open, onClose, trabajo, freelancer, onPostular }) => {
           fullWidth
           value={mensaje}
           onChange={(e) => setMensaje(e.target.value)}
+          className="mensajeInput"
         />
         <TextField
           margin="dense"
@@ -100,11 +93,12 @@ const PostularPopup = ({ open, onClose, trabajo, freelancer, onPostular }) => {
           fullWidth
           value={presupuesto}
           onChange={(e) => setPresupuesto(e.target.value)}
+          className="presupuestoInput"
         />
       </DialogContent>
-      <DialogActions>
-        <Button onClick={onClose}>Cancelar</Button>
-        <Button onClick={handlePostular}>Postular</Button>
+      <DialogActions className="dialogActions">
+        <Button onClick={onClose} className="cancelButton">Cancelar</Button>
+        <Button onClick={handlePostular} className="postularButton">Postular</Button>
       </DialogActions>
     </Dialog>
   );

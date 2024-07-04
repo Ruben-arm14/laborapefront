@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useContext } from 'react';
-import { Box, Grid, Container } from '@mui/material';
+import { Box, Grid, Container, Typography, Button, CircularProgress } from '@mui/material';
 import LogoBar from '@/components/layout/LogoBar';
-import styles from '@/styles/global/verPropuestas.module.css';
+import styles from '@/styles/global/verpropuestascliente.module.css';
 import { AppContext } from '@/context/AppContext';
 
 const VerPropuestas = () => {
@@ -97,14 +97,14 @@ const VerPropuestas = () => {
     }
   };
 
-  if (loading) return <p>Loading...</p>;
+  if (loading) return <CircularProgress />;
   if (error) return <p>Error: {error.message}</p>;
 
   return (
     <div className={styles.bodyNoMargin}>
       <LogoBar />
       <Container className={styles.pageContainer}>
-        <h1 className={styles.subtitle}>Propuestas</h1>
+        <Typography variant="h4" className={styles.subtitle}>Propuestas</Typography>
         <Box className={styles.propuestasWrapper}>
           <Grid container spacing={4} direction="column">
             {propuestas
@@ -120,20 +120,20 @@ const VerPropuestas = () => {
                       />
                     </div>
                     <div className={styles.freelancerDetails}>
-                      <p><strong>Nombre:</strong> {propuesta.freelancer.usuario.nombre}</p>
-                      <p><strong>Edad:</strong> {propuesta.freelancer.usuario.edad}</p>
-                      <p><strong>Habilidades:</strong> {propuesta.freelancer.habilidades}</p>
-                      <p><strong>Disponibilidad:</strong> {propuesta.disponibilidad}</p>
-                      <p><strong>Comentario:</strong> {propuesta.mensaje}</p>
+                      <Typography variant="h6">{propuesta.freelancer.usuario.nombre}</Typography>
+                      <Typography variant="body1"><strong>Edad:</strong> {propuesta.freelancer.usuario.edad}</Typography>
+                      <Typography variant="body1"><strong>Habilidades:</strong> {propuesta.freelancer.habilidades}</Typography>
+                      <Typography variant="body1"><strong>Disponibilidad:</strong> {propuesta.disponibilidad}</Typography>
+                      <Typography variant="body1"><strong>Comentario:</strong> {propuesta.mensaje}</Typography>
                     </div>
                   </div>
                   <div className={styles.trabajoDetails}>
-                    <h4><strong>Trabajo:</strong> {propuesta.trabajo.titulo}</h4>
-                    <p><strong>Presupuesto:</strong> {propuesta.presupuesto}</p>
+                    <Typography variant="h6"><strong>Trabajo:</strong> {propuesta.trabajo.titulo}</Typography>
+                    <Typography variant="body1"><strong>Presupuesto:</strong> {propuesta.presupuesto}</Typography>
                   </div>
                   <div className={styles.buttonsContainer}>
-                    <button className={styles.acceptButton} onClick={() => handleAceptar(propuesta.id)}>ACEPTAR</button>
-                    <button className={styles.rejectButton} onClick={() => handleRechazar(propuesta.id)}>RECHAZAR</button>
+                    <Button variant="contained" color="primary" onClick={() => handleAceptar(propuesta.id)}>Aceptar</Button>
+                    <Button variant="contained" color="secondary" onClick={() => handleRechazar(propuesta.id)}>Rechazar</Button>
                   </div>
                 </Grid>
               ))}
