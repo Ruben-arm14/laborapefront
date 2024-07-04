@@ -74,6 +74,13 @@
   object-fit: cover;
 }
 
+.trabajoImage {
+  max-width: 100%;
+  height: auto;
+  max-height: 200px; /* Ajusta según sea necesario */
+  object-fit: cover;
+}
+
 .freelancerDetails {
   text-align: left;
   flex: 1;
@@ -108,7 +115,7 @@
   width: 100%;
 }
 
-.acceptButton, .rejectButton {
+.acceptButton, .rejectButton, .contactButton {
   padding: 10px 20px;
   border: none;
   border-radius: 5px;
@@ -126,10 +133,32 @@
   color: white;
 }
 
+.contactButton {
+  background-color: #007bff;
+  color: white;
+}
+
 .acceptButton:hover {
   background-color: #45a049;
 }
 
 .rejectButton:hover {
   background-color: #e53935;
+}
+
+.contactButton:hover {
+  background-color: #0056b3;
+}
+
+.clienteImageWrapper {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.clienteImage {
+  max-width: 100%;
+  height: auto;
+  max-height: 150px;
+  border-radius: 50%;
+  object-fit: cover;
 }

@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useContext } from 'react';
-import { Box, Grid, Alert, Button, Snackbar, Typography } from '@mui/material';
+import { Box, Grid, Alert, Button, Snackbar, Typography, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@mui/material';
 import LogoBarFreelance from '@/components/layout/LogoBarFreelance';
 import { AppContext } from '@/context/AppContext';
 import styles from '@/styles/global/verPropuestas.module.css';
@@ -9,6 +9,8 @@ const Propuestas = () => {
   const [propuestas, setPropuestas] = useState([]);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(false);
+  const [open, setOpen] = useState(false);
+  const [clienteInfo, setClienteInfo] = useState(null);
 
   useEffect(() => {
     if (!user || !user.idfreelancer) {
@@ -33,7 +35,7 @@ const Propuestas = () => {
   }, [user]);
 
   const handleCancel = async (propuestaId) => {
-    console.log(`Eliminando postulación con ID: ${propuestaId}`); // Verificar el ID
+    console.log(`Eliminando postulación con ID: ${propuestaId}`);
     try {
       const response = await fetch(`http://localhost:8080/postulaciones/${propuestaId}`, {
         method: 'DELETE',
@@ -46,6 +48,30 @@ const Propuestas = () => {
     } catch (err) {
       setError(err.message);
     }
+  };
+
+  const handleViewContact = async (clienteId) => {
+    if (!clienteId) {
+      setError("ID de cliente no encontrado.");
+      return;
+    }
+    console.log("Cliente ID:", clienteId);
+    try {
+      const response = await fetch(`http://localhost:8080/postulaciones/cliente/${clienteId}/detalle`);
+      if (!response.ok) {
+        throw new Error("Error HTTP! status: " + response.status);
+      }
+      const data = await response.json();
+      setClienteInfo(data);
+      setOpen(true);
+    } catch (err) {
+      setError(err.message);
+    }
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+    setClienteInfo(null);
   };
 
   return (
@@ -81,19 +107,19 @@ const Propuestas = () => {
                     <Typography variant="body2" className={styles.trabajoPresupuesto}>Presupuesto: {propuesta.presupuesto}</Typography>
                     <Typography variant="body2" className={styles.trabajoDisponibilidad}>Disponibilidad: {propuesta.disponibilidad}</Typography>
                     <Typography variant="body2" className={styles.trabajoEstado}>Estado: {propuesta.estado}</Typography>
-                    {propuesta.estado === 'ACEPTADA' ? (
+                    {propuesta.estado === 'ACEPTADO' ? (
                       <Button
                         variant="contained"
                         color="primary"
                         className={styles.contactButton}
-                        onClick={() => alert(`Contacto del cliente: ${propuesta.trabajo.cliente.contacto}`)}
+                        onClick={() => handleViewContact(propuesta.trabajo.cliente.idusuario)}
                       >
                         VER CONTACTO DEL CLIENTE
                       </Button>
                     ) : (
                       <Button
                         variant="contained"
-                        color="secondary"
+                        color={propuesta.estado === 'RECHAZADO' ? "error" : "secondary"}
                         className={styles.cancelButton}
                         onClick={() => handleCancel(propuesta.id)}
                       >
@@ -109,6 +135,32 @@ const Propuestas = () => {
           </Grid>
         </Box>
       </div>
+      <Dialog open={open} onClose={handleClose}>
+        <DialogTitle>Contacto del Cliente</DialogTitle>
+        <DialogContent>
+          {clienteInfo && (
+            <>
+              <div className={styles.clienteImageWrapper}>
+                <img
+                  src={`data:image/jpeg;base64,${clienteInfo.imagen}`}
+                  alt={clienteInfo.nombre}
+                  className={styles.clienteImage}
+                />
+              </div>
+              <DialogContentText>
+                <strong>Nombre:</strong> {clienteInfo.nombre}<br />
+                <strong>Email:</strong> {clienteInfo.correo}<br />
+                <strong>Número:</strong> {clienteInfo.numero}
+              </DialogContentText>
+            </>
+          )}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleClose} color="primary">
+            Cerrar
+          </Button>
+        </DialogActions>
+      </Dialog>
     </>
   );
 };

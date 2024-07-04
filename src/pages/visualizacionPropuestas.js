@@ -34,6 +34,69 @@ const VerPropuestas = () => {
     }
   }, [user]);
 
+  const handleAceptar = async (propuestaId) => {
+    const confirm = window.confirm("¿Seguro que desea aceptar la postulación? Se rechazarán las demás postulaciones en caso tengas activo.");
+    if (confirm) {
+      try {
+        const response = await fetch(`http://localhost:8080/postulaciones/${propuestaId}/aceptar`, {
+          method: 'POST',
+        });
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        // Volver a cargar las propuestas
+        const clienteId = sessionStorage.getItem('idcliente');
+        const fetchPropuestas = async () => {
+          try {
+            const response = await fetch(`http://localhost:8080/postulaciones/cliente/${clienteId}`);
+            if (!response.ok) {
+              throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            const data = await response.json();
+            setPropuestas(data.filter(propuesta => propuesta.estado === 'PENDIENTE'));
+          } catch (error) {
+            console.error('Error fetching postulaciones:', error);
+            setError(error);
+          }
+        };
+        fetchPropuestas();
+      } catch (error) {
+        console.error('Error accepting postulacion:', error);
+        setError(error);
+      }
+    }
+  };
+
+  const handleRechazar = async (propuestaId) => {
+    try {
+      const response = await fetch(`http://localhost:8080/postulaciones/${propuestaId}/rechazar`, {
+        method: 'POST',
+      });
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      // Volver a cargar las propuestas
+      const clienteId = sessionStorage.getItem('idcliente');
+      const fetchPropuestas = async () => {
+        try {
+          const response = await fetch(`http://localhost:8080/postulaciones/cliente/${clienteId}`);
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+          const data = await response.json();
+          setPropuestas(data.filter(propuesta => propuesta.estado === 'PENDIENTE'));
+        } catch (error) {
+          console.error('Error fetching postulaciones:', error);
+          setError(error);
+        }
+      };
+      fetchPropuestas();
+    } catch (error) {
+      console.error('Error rejecting postulacion:', error);
+      setError(error);
+    }
+  };
+
   if (loading) return <p>Loading...</p>;
   if (error) return <p>Error: {error.message}</p>;
 
@@ -44,34 +107,36 @@ const VerPropuestas = () => {
         <h1 className={styles.subtitle}>Propuestas</h1>
         <Box className={styles.propuestasWrapper}>
           <Grid container spacing={4} direction="column">
-            {propuestas.map((propuesta, index) => (
-              <Grid item key={index} className={styles.propuestaItem}>
-                <div className={styles.freelancerInfo}>
-                  <div className={styles.freelancerImageWrapper}>
-                    <img 
-                      src={`http://localhost:8080/postulaciones/freelancers/${propuesta.freelancer.usuario.idusuario}/imagen`} 
-                      alt={propuesta.freelancer.usuario.nombre} 
-                      className={styles.freelancerImage} 
-                    />
+            {propuestas
+              .filter(propuesta => propuesta.estado === 'PENDIENTE')
+              .map((propuesta, index) => (
+                <Grid item key={index} className={styles.propuestaItem}>
+                  <div className={styles.freelancerInfo}>
+                    <div className={styles.freelancerImageWrapper}>
+                      <img 
+                        src={`http://localhost:8080/postulaciones/freelancers/${propuesta.freelancer.usuario.idusuario}/imagen`} 
+                        alt={propuesta.freelancer.usuario.nombre} 
+                        className={styles.freelancerImage} 
+                      />
+                    </div>
+                    <div className={styles.freelancerDetails}>
+                      <p><strong>Nombre:</strong> {propuesta.freelancer.usuario.nombre}</p>
+                      <p><strong>Edad:</strong> {propuesta.freelancer.usuario.edad}</p>
+                      <p><strong>Habilidades:</strong> {propuesta.freelancer.habilidades}</p>
+                      <p><strong>Disponibilidad:</strong> {propuesta.disponibilidad}</p>
+                      <p><strong>Comentario:</strong> {propuesta.mensaje}</p>
+                    </div>
                   </div>
-                  <div className={styles.freelancerDetails}>
-                    <p><strong>Nombre:</strong> {propuesta.freelancer.usuario.nombre}</p>
-                    <p><strong>Edad:</strong> {propuesta.freelancer.usuario.edad}</p>
-                    <p><strong>Habilidades:</strong> {propuesta.freelancer.habilidades}</p>
-                    <p><strong>Disponibilidad:</strong> {propuesta.disponibilidad}</p>
-                    <p><strong>Comentario:</strong> {propuesta.mensaje}</p>
+                  <div className={styles.trabajoDetails}>
+                    <h4><strong>Trabajo:</strong> {propuesta.trabajo.titulo}</h4>
+                    <p><strong>Presupuesto:</strong> {propuesta.presupuesto}</p>
                   </div>
-                </div>
-                <div className={styles.trabajoDetails}>
-                  <h4><strong>Trabajo:</strong> {propuesta.trabajo.titulo}</h4>
-                  <p><strong>Presupuesto:</strong> {propuesta.presupuesto}</p>
-                </div>
-                <div className={styles.buttonsContainer}>
-                  <button className={styles.acceptButton}>ACEPTAR</button>
-                  <button className={styles.rejectButton}>RECHAZAR</button>
-                </div>
-              </Grid>
-            ))}
+                  <div className={styles.buttonsContainer}>
+                    <button className={styles.acceptButton} onClick={() => handleAceptar(propuesta.id)}>ACEPTAR</button>
+                    <button className={styles.rejectButton} onClick={() => handleRechazar(propuesta.id)}>RECHAZAR</button>
+                  </div>
+                </Grid>
+              ))}
           </Grid>
         </Box>
       </Container>

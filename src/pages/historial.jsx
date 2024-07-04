@@ -1,20 +1,35 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import LogoBarFreelance from '@/components/layout/LogoBarFreelance';
 import { Box, Grid, Tabs, Tab } from '@mui/material';
+import { AppContext } from '@/context/AppContext';
 import styles from '@/styles/global/historial.module.css';
 
 const Historial = () => {
+  const { user } = useContext(AppContext);
   const [historial, setHistorial] = useState([]);
   const [filtro, setFiltro] = useState('todos');
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    // Aquí se haría la llamada a la API para obtener el historial
-    setHistorial([
-      { id: 1, titulo: "Trabajo 1", descripcion: "Descripción del trabajo 1", ubicacion: "Lima, Perú", fecha: "2023-01-01", presupuesto: "$1000", estado: "Nuevo" },
-      { id: 2, titulo: "Trabajo 2", descripcion: "Descripción del trabajo 2", ubicacion: "Arequipa, Perú", fecha: "2023-02-01", presupuesto: "$2000", estado: "En Proceso" },
-      { id: 3, titulo: "Trabajo 3", descripcion: "Descripción del trabajo 3", ubicacion: "Cusco, Perú", fecha: "2023-03-01", presupuesto: "$3000", estado: "Terminado" },
-    ]);
-  }, []);
+    if (user && user.idfreelancer) {
+      const fetchHistorial = async () => {
+        try {
+          const response = await fetch(`http://localhost:8080/postulaciones/freelancer/${user.idfreelancer}`);
+          if (!response.ok) {
+            throw new Error(`Error HTTP! status: ${response.status}`);
+          }
+          const data = await response.json();
+          setHistorial(data);
+        } catch (error) {
+          setError(error.message);
+        } finally {
+          setLoading(false);
+        }
+      };
+      fetchHistorial();
+    }
+  }, [user]);
 
   const handleFiltroChange = (event, newValue) => {
     setFiltro(newValue);
@@ -22,26 +37,36 @@ const Historial = () => {
 
   const filteredHistorial = historial.filter(item => filtro === 'todos' || item.estado === filtro);
 
+  if (loading) return <p>Cargando...</p>;
+  if (error) return <p>Error: {error}</p>;
+
   return (
     <div className={styles.container}>
       <LogoBarFreelance />
       <h1 className={styles.title}>Historial</h1>
       <Tabs value={filtro} onChange={handleFiltroChange} className={styles.tabs}>
         <Tab label="Todos" value="todos" />
-        <Tab label="Nuevo" value="Nuevo" />
-        <Tab label="En Proceso" value="En Proceso" />
-        <Tab label="Terminado" value="Terminado" />
+        <Tab label="En Proceso" value="EN_PROCESO" />
+        <Tab label="Terminado" value="TERMINADO" />
       </Tabs>
       <Box className={styles.historialContainer}>
         <Grid container spacing={2} direction="column">
           {filteredHistorial.map((historialItem) => (
             <Grid item key={historialItem.id} className={styles.historialItem}>
-              <img src="https://via.placeholder.com/150" alt={historialItem.titulo} className={styles.trabajoImage} />
+              {historialItem.trabajo.imagen ? (
+                <img
+                  src={`data:image/jpeg;base64,${historialItem.trabajo.imagen}`}
+                  alt={historialItem.trabajo.titulo}
+                  className={styles.trabajoImage}
+                />
+              ) : (
+                <p>Imagen no disponible.</p>
+              )}
               <div className={styles.historialDetails}>
-                <h2>{historialItem.titulo}</h2>
-                <p>{historialItem.descripcion}</p>
-                <p><strong>Ubicación:</strong> {historialItem.ubicacion}</p>
-                <p><strong>Fecha:</strong> {historialItem.fecha}</p>
+                <h2>{historialItem.trabajo.titulo}</h2>
+                <p>{historialItem.trabajo.descripcion}</p>
+                <p><strong>Ubicación:</strong> {historialItem.trabajo.ubicacion}</p>
+                <p><strong>Fecha:</strong> {historialItem.trabajo.fecha}</p>
                 <p><strong>Presupuesto:</strong> {historialItem.presupuesto}</p>
                 <p><strong>Estado:</strong> {historialItem.estado}</p>
               </div>
