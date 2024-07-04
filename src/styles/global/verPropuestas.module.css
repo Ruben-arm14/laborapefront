@@ -1,57 +1,135 @@
-.container {
+.bodyNoMargin {
+  margin: 0;
+  padding-top: 100px; /* Ajustar según la altura de la barra de navegación */
+  background-color: #f4f4f9;
+}
+
+.pageContainer {
   padding: 20px;
 }
 
 .title {
   text-align: center;
   margin-bottom: 20px;
+  font-size: 2em;
+  font-weight: bold;
+  color: #333;
 }
 
 .propuestasWrapper {
   max-width: 1200px;
-  margin: 0 auto;
+  margin: 60px auto 0 auto;
+  text-align: center;
+}
+
+.subtitle {
+  text-align: center;
+  margin-bottom: 40px;
+  font-size: 1.5em;
+  font-weight: bold;
+  color: #333;
 }
 
 .propuestaItem {
   display: flex;
-  justify-content: center;
-  margin-bottom: 20px;
-}
-
-.propuestaDetails {
+  flex-direction: column;
+  align-items: center;
+  margin: 40px 0;
   border: 1px solid #ddd;
   padding: 20px;
-  border-radius: 8px;
-  text-align: center;
-  max-width: 300px;
-  background-color: #f9f9f9;
+  border-radius: 12px;
+  background-color: #fff;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s, box-shadow 0.3s;
 }
 
-.trabajoImage {
-  max-width: 100%;
-  height: auto;
+.propuestaItem:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+.freelancerInfo {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px;
+  width: 100%;
+}
+
+.freelancerImageWrapper {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  margin-right: 20px;
+  border: 2px solid #ddd;
+  overflow: hidden;
+  background-color: #f7f7f7;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.freelancerImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.freelancerDetails {
+  text-align: left;
+  flex: 1;
+}
+
+.freelancerDetails p {
+  margin-bottom: 5px;
+  color: #666;
+}
+
+.trabajoDetails {
+  text-align: left;
+  width: 100%;
   margin-bottom: 20px;
 }
 
-.trabajoTitle {
-  font-size: 1.5em;
-  margin-bottom: 10px;
-}
-
-.trabajoDescription {
-  margin-bottom: 10px;
-}
-
-.trabajoUbicacion, .trabajoPresupuesto, .trabajoDisponibilidad, .trabajoEstado {
+.trabajoDetails h4 {
+  font-size: 1.2em;
   margin-bottom: 5px;
+  color: #555;
 }
 
-.cancelButton {
-  background-color: red;
+.trabajoDetails p {
+  margin-bottom: 10px;
+  color: #666;
+}
+
+.buttonsContainer {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  width: 100%;
+}
+
+.acceptButton, .rejectButton {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 1em;
+}
+
+.acceptButton {
+  background-color: #4CAF50;
   color: white;
 }
 
-.contactButton {
-  background-color: green;
+.rejectButton {
+  background-color: #F44336;
   color: white;
+}
+
+.acceptButton:hover {
+  background-color: #45a049;
+}
+
+.rejectButton:hover {
+  background-color: #e53935;
 }

@@ -6,7 +6,7 @@ import styles from "@/styles/global/login.module.css";
 
 const LoginForm = () => {
   const router = useRouter();
-  const { setUser } = useContext(AppContext);
+  const { setUser, setClienteId } = useContext(AppContext);
   const [formData, setFormData] = useState({ correo: "", contrasenia: "" });
   const [error, setError] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -36,8 +36,9 @@ const LoginForm = () => {
         sessionStorage.setItem('usuario', JSON.stringify(userData.usuario)); // Cambiado a sessionStorage
         
         if (userData.usuario.rol === 'CLIENTE') {
+          setClienteId(userData.idcliente);
           sessionStorage.setItem('idcliente', userData.idcliente);
-          router.push('/visualizacionPropuestas');
+          router.push('/publicacion');
         } else if (userData.usuario.rol === 'FREELANCER') {
           router.push('/trabajosFreelancer');
         } else if (userData.usuario.rol === 'ADMIN') {
