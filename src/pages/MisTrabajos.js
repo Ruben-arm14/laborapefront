@@ -62,21 +62,6 @@ const MisTrabajos = () => {
   const handleEdit = (trabajo) => {
     setTrabajoParaEditar(trabajo);
   };
-
-  const handleDelete = async (idtrabajo) => {
-    try {
-      const response = await fetch(`http://localhost:8080/trabajos/${idtrabajo}`, {
-        method: 'DELETE'
-      });
-      if (!response.ok) {
-        throw new Error("Error HTTP! status: " + response.status);
-      }
-      setTrabajos(trabajos.filter(trabajo => trabajo.idtrabajo !== idtrabajo));
-    } catch (err) {
-      setError(err.message);
-    }
-  };
-
   const actualizarEstadoTrabajo = async (idtrabajo, estado) => {
     try {
       const response = await fetch(`http://localhost:8080/trabajos/${idtrabajo}/actualizar-estado`, {
@@ -92,6 +77,35 @@ const MisTrabajos = () => {
       // Actualizamos el estado del trabajo localmente
       setTrabajos(trabajos.map(trabajo =>
         trabajo.idtrabajo === idtrabajo ? { ...trabajo, estado } : trabajo
+      ));
+    } catch (err) {
+      setError(err.message);
+    }
+  };
+  const handleDelete = async (idtrabajo) => {
+    try {
+      const response = await fetch(`http://localhost:8080/trabajos/${idtrabajo}`, {
+        method: 'DELETE'
+      });
+      if (!response.ok) {
+        throw new Error("Error HTTP! status: " + response.status);
+      }
+      setTrabajos(trabajos.filter(trabajo => trabajo.idtrabajo !== idtrabajo));
+    } catch (err) {
+      setError(err.message);
+    }
+  };
+
+  const finalizarTrabajoYPostulacion = async (idtrabajo) => {
+    try {
+      const response = await fetch(`http://localhost:8080/trabajos/${idtrabajo}/finalizar`, {
+        method: 'PUT'
+      });
+      if (!response.ok) {
+        throw new Error("Error HTTP! status: " + response.status);
+      }
+      setTrabajos(trabajos.map(trabajo =>
+        trabajo.idtrabajo === idtrabajo ? { ...trabajo, estado: 'FINALIZADO' } : trabajo
       ));
     } catch (err) {
       setError(err.message);
@@ -133,7 +147,7 @@ const MisTrabajos = () => {
   const handleConfirmFinalize = async () => {
     if (trabajoParaContacto) {
       try {
-        await actualizarEstadoTrabajo(trabajoParaContacto.idtrabajo, 'FINALIZADO');
+        await finalizarTrabajoYPostulacion(trabajoParaContacto.idtrabajo);
         setOpenFinalizeModal(false);
         setTrabajoParaContacto(null);
         setOpenSnackbar(true);
@@ -148,9 +162,7 @@ const MisTrabajos = () => {
   };
 
   const handleSave = (updatedTrabajo) => {
-    // Lógica para guardar el trabajo actualizado (podrías hacer una llamada al backend aquí)
     setTrabajoParaEditar(null);
-    // Actualizar la lista de trabajos localmente
     setTrabajos(trabajos.map(trabajo =>
       trabajo.idtrabajo === updatedTrabajo.idtrabajo ? updatedTrabajo : trabajo
     ));

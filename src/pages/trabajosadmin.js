@@ -24,7 +24,7 @@ const TrabajosAdmin = () => {
     if (user && user.rol === 'ADMIN') {
       fetchTrabajosEnRevision();
     } else {
-      setError("No tienes permisos para ver esta página.");
+      setError("");
     }
   }, [user]);
 
