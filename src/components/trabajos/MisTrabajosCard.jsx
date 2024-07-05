@@ -12,10 +12,7 @@ const MisTrabajosCard = ({ trabajo, onEdit, onDelete, onContact, onFinalize, onR
 
   const handleContact = () => {
     console.log("Objeto trabajo:", trabajo);
-    console.log("Botón 'Ver Contacto' presionado para usuario ID:", trabajo.idcliente);
-    if (trabajo.idcliente) {
-      onContact(trabajo.idcliente);
-    }
+    onContact(trabajo.idtrabajo);
   };
 
   const renderButtons = () => {
@@ -61,9 +58,6 @@ const MisTrabajosCard = ({ trabajo, onEdit, onDelete, onContact, onFinalize, onR
       <p>Fecha Límite: {new Date(trabajo.fechaLimite).toLocaleString()}</p>
       <p>Categoría: {trabajo.categoria}</p>
       <p>Estado: {trabajo.estado}</p>
-      {trabajo.freelancer && (trabajo.estado === 'ACEPTADO' || trabajo.estado === 'EN_PROCESO' || trabajo.estado === 'FINALIZADO') ? (
-        <p>Freelancer: {trabajo.freelancer.nombre}</p>
-      ) : null}
       <div className={styles.actions}>
         {renderButtons()}
       </div>

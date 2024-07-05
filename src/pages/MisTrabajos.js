@@ -3,7 +3,6 @@ import { Box, Grid, Alert, MenuItem, Select, FormControl, InputLabel, Pagination
 import MisTrabajosCard from '@/components/trabajos/MisTrabajosCard';
 import LogoBar from '@/components/layout/LogoBar';
 import { AppContext } from '@/context/AppContext';
-import EditarTrabajoModal from '@/components/trabajos/EditarTrabajoModal';
 import styles from '@/styles/global/misTrabajos.module.css';
 
 const MisTrabajos = () => {
@@ -62,6 +61,7 @@ const MisTrabajos = () => {
   const handleEdit = (trabajo) => {
     setTrabajoParaEditar(trabajo);
   };
+
   const actualizarEstadoTrabajo = async (idtrabajo, estado) => {
     try {
       const response = await fetch(`http://localhost:8080/trabajos/${idtrabajo}/actualizar-estado`, {
@@ -74,7 +74,6 @@ const MisTrabajos = () => {
       if (!response.ok) {
         throw new Error("Error HTTP! status: " + response.status);
       }
-      // Actualizamos el estado del trabajo localmente
       setTrabajos(trabajos.map(trabajo =>
         trabajo.idtrabajo === idtrabajo ? { ...trabajo, estado } : trabajo
       ));
@@ -82,6 +81,7 @@ const MisTrabajos = () => {
       setError(err.message);
     }
   };
+
   const handleDelete = async (idtrabajo) => {
     try {
       const response = await fetch(`http://localhost:8080/trabajos/${idtrabajo}`, {
@@ -112,27 +112,26 @@ const MisTrabajos = () => {
     }
   };
 
-  const handleContact = async (trabajo, idusuario) => {
-    console.log("handleContact llamado con usuario ID:", idusuario);
+  const handleContact = async (idtrabajo) => {
+    console.log("handleContact llamado con idtrabajo:", idtrabajo);
     try {
-      if (trabajo.estado === 'ACEPTADO') {
-        await actualizarEstadoTrabajo(trabajo.idtrabajo, 'EN_PROCESO');
-      }
-
-      const response = await fetch(`http://localhost:8080/freelancers/${idusuario}/detalle`);
+      // Actualizar el estado del trabajo a "EN_PROCESO"
+      await actualizarEstadoTrabajo(idtrabajo, 'EN_PROCESO');
+  
+      // Obtener la información del freelancer
+      const response = await fetch(`http://localhost:8080/freelancers/trabajo/${idtrabajo}/detalle`);
       if (!response.ok) {
         throw new Error("Error HTTP! status: " + response.status);
       }
       const freelancerData = await response.json();
       console.log("Datos del freelancer:", freelancerData);
       setFreelancerInfo(freelancerData);
-      setTrabajoParaContacto(trabajo);
       setOpenFreelancerModal(true);
     } catch (err) {
       setError(err.message);
     }
   };
-
+  
   const handleCloseFreelancerModal = () => {
     setOpenFreelancerModal(false);
     setFreelancerInfo(null);
@@ -224,7 +223,7 @@ const MisTrabajos = () => {
                   trabajo={trabajo}
                   onEdit={handleEdit}
                   onDelete={handleDelete}
-                  onContact={() => handleContact(trabajo, user.idusuario)}
+                  onContact={() => handleContact(trabajo.idtrabajo)}
                   onFinalize={() => handleFinalize(trabajo)}
                   onRate={handleRate}
                 />
@@ -245,28 +244,22 @@ const MisTrabajos = () => {
             onSave={handleSave}
           />
         )}
-        {trabajoParaContacto && (
+        {freelancerInfo && (
           <Dialog open={openFreelancerModal} onClose={handleCloseFreelancerModal}>
             <DialogTitle>Contacto del Freelancer</DialogTitle>
             <DialogContent>
-              {freelancerInfo ? (
-                <>
-                  <div className={styles.freelancerImageWrapper}>
-                    <img
-                      src={`data:image/jpeg;base64,${freelancerInfo.imagen}`}
-                      alt={freelancerInfo.nombre}
-                      className={styles.freelancerImage}
-                    />
-                  </div>
-                  <DialogContentText>
-                    <strong>Nombre:</strong> {freelancerInfo.nombre}<br />
-                    <strong>Email:</strong> {freelancerInfo.correo}<br />
-                    <strong>Número:</strong> {freelancerInfo.numero}<br />
-                  </DialogContentText>
-                </>
-              ) : (
-                <DialogContentText>Cargando información del freelancer...</DialogContentText>
-              )}
+              <div className={styles.freelancerImageWrapper}>
+                <img
+                  src={`data:image/jpeg;base64,${freelancerInfo.imagen}`}
+                  alt={freelancerInfo.nombre}
+                  className={styles.freelancerImage}
+                />
+              </div>
+              <DialogContentText>
+                <strong>Nombre:</strong> {freelancerInfo.nombre}<br />
+                <strong>Email:</strong> {freelancerInfo.correo}<br />
+                <strong>Número:</strong> {freelancerInfo.numero}<br />
+              </DialogContentText>
             </DialogContent>
             <DialogActions>
               <Button onClick={handleCloseFreelancerModal} color="primary">
