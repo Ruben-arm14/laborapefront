@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Dialog, DialogTitle, DialogContent, DialogActions, Button, TextField, Typography, Box, FormControl, InputLabel, Select, MenuItem } from '@mui/material';
 import { toast } from 'react-toastify';
+import styles from '@/styles/global/postularPopup.module.css';
 
 const PostularPopup = ({ open, onClose, trabajo, freelancer, onPostular }) => {
   const [mensaje, setMensaje] = useState('');
@@ -54,17 +55,17 @@ const PostularPopup = ({ open, onClose, trabajo, freelancer, onPostular }) => {
   };
 
   return (
-    <Dialog open={open} onClose={onClose} classes={{ paper: 'dialogPaper' }}>
-      <DialogTitle className="dialogTitle">Postular a {trabajo?.titulo}</DialogTitle>
-      <DialogContent className="dialogContent">
+    <Dialog open={open} onClose={onClose} classes={{ paper: styles.dialogPaper }}>
+      <DialogTitle className={styles.dialogTitle}>Postular a {trabajo?.titulo}</DialogTitle>
+      <DialogContent className={styles.dialogContent}>
         <Box mb={2} display="flex" justifyContent="center">
-          <img src={`http://localhost:8080/trabajos/${trabajo?.idtrabajo}/imagen`} alt={trabajo?.titulo} className="trabajoImage" />
+          <img src={`http://localhost:8080/trabajos/${trabajo?.idtrabajo}/imagen`} alt={trabajo?.titulo} className={styles.trabajoImage} />
         </Box>
-        <Typography variant="h6" className="trabajoTitulo">{trabajo?.titulo}</Typography>
+        <Typography variant="h6" className={styles.trabajoTitulo}>{trabajo?.titulo}</Typography>
         <Typography variant="body2" color="textSecondary" gutterBottom>{trabajo?.nombreCliente || 'Desconocido'}</Typography>
-        <Typography variant="body1" gutterBottom className="trabajoDescripcion">{trabajo?.descripcion}</Typography>
-        <Typography variant="body2" color="textSecondary" gutterBottom className="trabajoUbicacion">Ubicación: {trabajo?.ubicacion}</Typography>
-        <Typography variant="body2" color="textSecondary" gutterBottom className="trabajoFechaLimite">Fecha Límite: {trabajo?.fechaLimite}</Typography>
+        <Typography variant="body1" gutterBottom className={styles.trabajoDescripcion}>{trabajo?.descripcion}</Typography>
+        <Typography variant="body2" color="textSecondary" gutterBottom className={styles.trabajoUbicacion}>Ubicación: {trabajo?.ubicacion}</Typography>
+        <Typography variant="body2" color="textSecondary" gutterBottom className={styles.trabajoFechaLimite}>Fecha Límite: {trabajo?.fechaLimite}</Typography>
         <FormControl fullWidth margin="dense">
           <InputLabel>Disponibilidad</InputLabel>
           <Select
@@ -84,7 +85,7 @@ const PostularPopup = ({ open, onClose, trabajo, freelancer, onPostular }) => {
           fullWidth
           value={mensaje}
           onChange={(e) => setMensaje(e.target.value)}
-          className="mensajeInput"
+          className={styles.mensajeInput}
         />
         <TextField
           margin="dense"
@@ -93,12 +94,12 @@ const PostularPopup = ({ open, onClose, trabajo, freelancer, onPostular }) => {
           fullWidth
           value={presupuesto}
           onChange={(e) => setPresupuesto(e.target.value)}
-          className="presupuestoInput"
+          className={styles.presupuestoInput}
         />
       </DialogContent>
-      <DialogActions className="dialogActions">
-        <Button onClick={onClose} className="cancelButton">Cancelar</Button>
-        <Button onClick={handlePostular} className="postularButton">Postular</Button>
+      <DialogActions className={styles.dialogActions}>
+        <Button onClick={onClose} className={styles.cancelButton}>Cancelar</Button>
+        <Button onClick={handlePostular} className={styles.postularButton}>Postular</Button>
       </DialogActions>
     </Dialog>
   );

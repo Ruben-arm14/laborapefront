@@ -34,10 +34,10 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin-bottom: 20px;
- /* Ajusta el ancho según tus necesidades */
+  margin: 20px; /* Aumenta la separación entre tarjetas */
   max-width: 400px; /* Máximo ancho de cada tarjeta */
 }
+
 
 .trabajoDetailsFreelancer {
   text-align: center;

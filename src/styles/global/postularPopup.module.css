@@ -23,6 +23,7 @@
     height: auto;
     border-radius: 10px;
     margin-bottom: 10px;
+    object-fit: contain; /* Asegura que la imagen se ajuste al contenedor sin recortarse */
 }
 
 .trabajoTitulo {
