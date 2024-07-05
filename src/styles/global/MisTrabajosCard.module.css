@@ -45,6 +45,49 @@
   font-size: 14px;
 }
 
+.contactButton {
+  background-color: #28a745;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.finalizeButton {
+  background-color: #ffc107;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.rateButton {
+  background-color: #17a2b8;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
 .budget {
   font-weight: bold;
+}
+
+.freelancerImageWrapper {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.freelancerImage {
+  max-width: 100%;
+  height: auto;
+  max-height: 150px;
+  border-radius: 50%;
+  object-fit: cover;
 }

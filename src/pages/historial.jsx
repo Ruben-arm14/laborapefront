@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext } from 'react';
 import LogoBarFreelance from '@/components/layout/LogoBarFreelance';
-import { Box, Grid, Tabs, Tab } from '@mui/material';
+import { Box, Grid, Tabs, Tab, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Button, Typography } from '@mui/material';
 import { AppContext } from '@/context/AppContext';
 import styles from '@/styles/global/historial.module.css';
 
@@ -10,6 +10,8 @@ const Historial = () => {
   const [filtro, setFiltro] = useState('todos');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [open, setOpen] = useState(false);
+  const [clienteInfo, setClienteInfo] = useState(null);
 
   useEffect(() => {
     if (user && user.idfreelancer) {
@@ -33,6 +35,25 @@ const Historial = () => {
 
   const handleFiltroChange = (event, newValue) => {
     setFiltro(newValue);
+  };
+
+  const handleViewContact = async (trabajo) => {
+    try {
+      const response = await fetch(`http://localhost:8080/postulaciones/cliente/${trabajo.trabajo.cliente.idcliente}/detalle`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch client details');
+      }
+      const clienteData = await response.json();
+      setClienteInfo(clienteData);
+      setOpen(true);
+    } catch (err) {
+      setError(err.message);
+    }
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+    setClienteInfo(null);
   };
 
   // Filtrar propuestas para mostrar solo las que están en los estados EN_PROCESO y TERMINADO
@@ -76,12 +97,49 @@ const Historial = () => {
                 <p><strong>Fecha:</strong> {historialItem.trabajo.fecha}</p>
                 <p><strong>Presupuesto:</strong> {historialItem.presupuesto}</p>
                 <p><strong>Estado:</strong> {historialItem.estado}</p>
+                {historialItem.estado === 'EN_PROCESO' && (
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    onClick={() => handleViewContact(historialItem)}
+                  >
+                    Ver Contacto
+                  </Button>
+                )}
               </div>
-              <button className={styles.resenaButton}>Escribir Reseña</button>
+              {historialItem.estado === 'TERMINADO' && (
+                <button className={styles.resenaButton}>Escribir Reseña</button>
+              )}
             </Grid>
           ))}
         </Grid>
       </Box>
+      <Dialog open={open} onClose={handleClose}>
+        <DialogTitle>Contacto del Cliente</DialogTitle>
+        <DialogContent>
+          {clienteInfo && (
+            <>
+              <div className={styles.clienteImageWrapper}>
+                <img
+                  src={`data:image/jpeg;base64,${clienteInfo.imagen}`}
+                  alt={clienteInfo.nombre}
+                  className={styles.clienteImage}
+                />
+              </div>
+              <DialogContentText>
+                <strong>Nombre:</strong> {clienteInfo.nombre}<br />
+                <strong>Email:</strong> {clienteInfo.correo}<br />
+                <strong>Número:</strong> {clienteInfo.numero}
+              </DialogContentText>
+            </>
+          )}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleClose} color="primary">
+            Cerrar
+          </Button>
+        </DialogActions>
+      </Dialog>
     </div>
   );
 };

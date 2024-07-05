@@ -19,7 +19,6 @@
 .propuestasWrapper {
   max-width: 1200px;
   margin: 0 auto;
-  padding-top: 100px;
   text-align: center;
 }
 
@@ -60,19 +59,16 @@
 
 .freelancerDetails {
   text-align: left;
-  padding-left: 50px;
 }
 
 .trabajoDetails {
   text-align: left;
-  padding-left: 100px;
   margin-bottom: 20px;
 }
 
 .buttonsContainer {
   display: flex;
   gap: 10px;
-  margin-left: 200px;
 }
 
 .buttonsContainer Button {

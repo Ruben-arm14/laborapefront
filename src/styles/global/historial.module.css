@@ -4,23 +4,23 @@
   flex-direction: column;
   align-items: center;
   padding: 20px;
-  overflow-y: auto; /* Permite el scroll vertical */
-  height: 100vh; /* Ajusta la altura del contenedor para ocupar toda la pantalla */
-  background-color: #f4f4f9; /* Fondo claro para un mejor contraste */
+  overflow-y: auto;
+  height: 100vh;
+  background-color: #f4f4f9;
 }
 
 .title {
   font-size: 2.5rem;
   padding-top: 70px;
   margin-bottom: 30px;
-  color: #333; /* Color de texto oscuro para el título */
+  color: #333;
 }
 
 .tabs {
   margin-bottom: 40px;
-  background-color: #fff; /* Fondo blanco para las pestañas */
-  border-radius: 8px; /* Bordes redondeados */
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Sombra sutil */
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .historialContainer {
@@ -38,12 +38,12 @@
   align-items: center;
   justify-content: space-between;
   margin-bottom: 20px;
-  transition: transform 0.3s, box-shadow 0.3s; /* Transiciones suaves */
+  transition: transform 0.3s, box-shadow 0.3s;
 }
 
 .historialItem:hover {
   transform: translateY(-5px);
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15); /* Sombra más intensa al hacer hover */
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
 }
 
 .trabajoImage {
@@ -57,13 +57,13 @@
 .historialDetails {
   flex-grow: 1;
   margin-right: 20px;
-  color: #666; /* Color de texto gris para los detalles */
+  color: #666;
 }
 
 .historialDetails h2 {
   font-size: 1.5rem;
   margin-bottom: 10px;
-  color: #333; /* Color de texto oscuro para el título del trabajo */
+  color: #333;
 }
 
 .historialDetails p {
@@ -78,9 +78,21 @@
   border-radius: 5px;
   cursor: pointer;
   font-size: 14px;
-  transition: background-color 0.3s; /* Transición suave */
+  transition: background-color 0.3s;
 }
 
 .resenaButton:hover {
-  background-color: #0056b3; /* Color más oscuro al hacer hover */
+  background-color: #0056b3;
+}
+
+.clienteImageWrapper {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.clienteImage {
+  max-width: 100%;
+  height: auto;
+  border-radius: 50%;
+  object-fit: cover;
 }
