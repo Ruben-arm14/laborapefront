@@ -10,10 +10,13 @@ const MisTrabajos = () => {
   const { user, setUser } = useContext(AppContext);
   const [trabajos, setTrabajos] = useState([]);
   const [error, setError] = useState(null);
-  const [trabajoSeleccionado, setTrabajoSeleccionado] = useState(null);
+  const [trabajoParaEditar, setTrabajoParaEditar] = useState(null);
+  const [trabajoParaContacto, setTrabajoParaContacto] = useState(null);
   const [freelancerInfo, setFreelancerInfo] = useState(null);
   const [openFreelancerModal, setOpenFreelancerModal] = useState(false);
   const [openSnackbar, setOpenSnackbar] = useState(false);
+  const [openFinalizeModal, setOpenFinalizeModal] = useState(false);
+  const [openRateSnackbar, setOpenRateSnackbar] = useState(false);
   const [page, setPage] = useState(1);
   const [estadoFiltro, setEstadoFiltro] = useState('EN_REVISION'); // Estado por defecto
   const itemsPerPage = 4;
@@ -57,7 +60,7 @@ const MisTrabajos = () => {
   }, [user, estadoFiltro]);
 
   const handleEdit = (trabajo) => {
-    setTrabajoSeleccionado(trabajo);
+    setTrabajoParaEditar(trabajo);
   };
 
   const handleDelete = async (idtrabajo) => {
@@ -74,26 +77,10 @@ const MisTrabajos = () => {
     }
   };
 
-  const handleContact = async (idusuario) => {
-    console.log("handleContact llamado con usuario ID:", idusuario);
-    try {
-      const response = await fetch(`http://localhost:8080/freelancers/${idusuario}/detalle`);
-      if (!response.ok) {
-        throw new Error("Error HTTP! status: " + response.status);
-      }
-      const freelancerData = await response.json();
-      console.log("Datos del freelancer:", freelancerData);
-      setFreelancerInfo(freelancerData);
-      setOpenFreelancerModal(true);
-    } catch (err) {
-      setError(err.message);
-    }
-  };
-
   const actualizarEstadoTrabajo = async (idtrabajo, estado) => {
     try {
       const response = await fetch(`http://localhost:8080/trabajos/${idtrabajo}/actualizar-estado`, {
-        method: 'POST',
+        method: 'PUT',
         headers: {
           'Content-Type': 'application/json'
         },
@@ -110,57 +97,63 @@ const MisTrabajos = () => {
       setError(err.message);
     }
   };
-  
 
-  const handleCloseFreelancerModal = async () => {
+  const handleContact = async (trabajo, idusuario) => {
+    console.log("handleContact llamado con usuario ID:", idusuario);
+    try {
+      if (trabajo.estado === 'ACEPTADO') {
+        await actualizarEstadoTrabajo(trabajo.idtrabajo, 'EN_PROCESO');
+      }
+
+      const response = await fetch(`http://localhost:8080/freelancers/${idusuario}/detalle`);
+      if (!response.ok) {
+        throw new Error("Error HTTP! status: " + response.status);
+      }
+      const freelancerData = await response.json();
+      console.log("Datos del freelancer:", freelancerData);
+      setFreelancerInfo(freelancerData);
+      setTrabajoParaContacto(trabajo);
+      setOpenFreelancerModal(true);
+    } catch (err) {
+      setError(err.message);
+    }
+  };
+
+  const handleCloseFreelancerModal = () => {
     setOpenFreelancerModal(false);
     setFreelancerInfo(null);
     setOpenSnackbar(true);
-
-    // Llama a actualizarEstadoTrabajo para cambiar el estado del trabajo a "EN_PROCESO"
-    if (trabajoSeleccionado) {
-      await actualizarEstadoTrabajo(trabajoSeleccionado.idtrabajo, 'EN_PROCESO');
-    }
   };
 
-  const handleAccept = async (idtrabajo) => {
-    try {
-      const response = await fetch(`http://localhost:8080/trabajos/${idtrabajo}/aceptar`, {
-        method: 'PUT'
-      });
-      if (!response.ok) {
-        throw new Error("Error HTTP! status: " + response.status);
+  const handleFinalize = (trabajo) => {
+    setTrabajoParaContacto(trabajo);
+    setOpenFinalizeModal(true);
+  };
+
+  const handleConfirmFinalize = async () => {
+    if (trabajoParaContacto) {
+      try {
+        await actualizarEstadoTrabajo(trabajoParaContacto.idtrabajo, 'FINALIZADO');
+        setOpenFinalizeModal(false);
+        setTrabajoParaContacto(null);
+        setOpenSnackbar(true);
+      } catch (err) {
+        setError(err.message);
       }
-      setTrabajos(trabajos.map(trabajo => 
-        trabajo.idtrabajo === idtrabajo ? { ...trabajo, estado: 'ACEPTADO' } : trabajo
-      ));
-    } catch (err) {
-      setError(err.message);
     }
   };
 
-  const handleFinalize = async (idtrabajo) => {
-    try {
-      const response = await fetch(`http://localhost:8080/trabajos/${idtrabajo}/finalizar`, {
-        method: 'PUT'
-      });
-      if (!response.ok) {
-        throw new Error("Error HTTP! status: " + response.status);
-      }
-      setTrabajos(trabajos.map(trabajo => 
-        trabajo.idtrabajo === idtrabajo ? { ...trabajo, estado: 'FINALIZADO' } : trabajo
-      ));
-    } catch (err) {
-      setError(err.message);
-    }
+  const handleRate = () => {
+    setOpenRateSnackbar(true);
   };
 
-  const handleRate = (idtrabajo) => {
-    // lógica para calificar el trabajo
-  };
-
-  const closeModal = () => {
-    setTrabajoSeleccionado(null);
+  const handleSave = (updatedTrabajo) => {
+    // Lógica para guardar el trabajo actualizado (podrías hacer una llamada al backend aquí)
+    setTrabajoParaEditar(null);
+    // Actualizar la lista de trabajos localmente
+    setTrabajos(trabajos.map(trabajo =>
+      trabajo.idtrabajo === updatedTrabajo.idtrabajo ? updatedTrabajo : trabajo
+    ));
   };
 
   const handlePageChange = (event, value) => {
@@ -173,6 +166,10 @@ const MisTrabajos = () => {
 
   const handleCloseSnackbar = () => {
     setOpenSnackbar(false);
+  };
+
+  const handleCloseRateSnackbar = () => {
+    setOpenRateSnackbar(false);
   };
 
   const paginatedTrabajos = trabajos.slice((page - 1) * itemsPerPage, page * itemsPerPage);
@@ -215,9 +212,8 @@ const MisTrabajos = () => {
                   trabajo={trabajo}
                   onEdit={handleEdit}
                   onDelete={handleDelete}
-                  onContact={handleContact}
-                  onAccept={handleAccept}
-                  onFinalize={handleFinalize}
+                  onContact={() => handleContact(trabajo, user.idusuario)}
+                  onFinalize={() => handleFinalize(trabajo)}
                   onRate={handleRate}
                 />
               </Grid>
@@ -230,47 +226,79 @@ const MisTrabajos = () => {
           onChange={handlePageChange}
           className={styles.pagination}
         />
-        {trabajoSeleccionado && (
+        {trabajoParaEditar && (
           <EditarTrabajoModal
-            trabajo={trabajoSeleccionado}
-            onClose={closeModal}
+            trabajo={trabajoParaEditar}
+            onClose={() => setTrabajoParaEditar(null)}
+            onSave={handleSave}
           />
         )}
-        <Dialog open={openFreelancerModal} onClose={handleCloseFreelancerModal}>
-          <DialogTitle>Contacto del Freelancer</DialogTitle>
-          <DialogContent>
-            {freelancerInfo ? (
-              <>
-                <div className={styles.freelancerImageWrapper}>
-                  <img
-                    src={`data:image/jpeg;base64,${freelancerInfo.imagen}`}
-                    alt={freelancerInfo.nombre}
-                    className={styles.freelancerImage}
-                  />
-                </div>
-                <DialogContentText>
-                  <strong>Nombre:</strong> {freelancerInfo.nombre}<br />
-                  <strong>Email:</strong> {freelancerInfo.correo}<br />
-                  <strong>Número:</strong> {freelancerInfo.numero}<br />
-                </DialogContentText>
-              </>
-            ) : (
-              <DialogContentText>Cargando información del freelancer...</DialogContentText>
-            )}
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={handleCloseFreelancerModal} color="primary">
-              Cerrar
-            </Button>
-          </DialogActions>
-        </Dialog>
+        {trabajoParaContacto && (
+          <Dialog open={openFreelancerModal} onClose={handleCloseFreelancerModal}>
+            <DialogTitle>Contacto del Freelancer</DialogTitle>
+            <DialogContent>
+              {freelancerInfo ? (
+                <>
+                  <div className={styles.freelancerImageWrapper}>
+                    <img
+                      src={`data:image/jpeg;base64,${freelancerInfo.imagen}`}
+                      alt={freelancerInfo.nombre}
+                      className={styles.freelancerImage}
+                    />
+                  </div>
+                  <DialogContentText>
+                    <strong>Nombre:</strong> {freelancerInfo.nombre}<br />
+                    <strong>Email:</strong> {freelancerInfo.correo}<br />
+                    <strong>Número:</strong> {freelancerInfo.numero}<br />
+                  </DialogContentText>
+                </>
+              ) : (
+                <DialogContentText>Cargando información del freelancer...</DialogContentText>
+              )}
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={handleCloseFreelancerModal} color="primary">
+                Cerrar
+              </Button>
+            </DialogActions>
+          </Dialog>
+        )}
+        {trabajoParaContacto && (
+          <Dialog open={openFinalizeModal} onClose={() => setOpenFinalizeModal(false)}>
+            <DialogTitle>Confirmar Finalización</DialogTitle>
+            <DialogContent>
+              <DialogContentText>
+                ¿Estás seguro que deseas finalizar el trabajo?
+              </DialogContentText>
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={() => setOpenFinalizeModal(false)} color="primary">
+                Cancelar
+              </Button>
+              <Button onClick={handleConfirmFinalize} color="primary">
+                Aceptar
+              </Button>
+            </DialogActions>
+          </Dialog>
+        )}
         <Snackbar
           open={openSnackbar}
           autoHideDuration={6000}
           onClose={handleCloseSnackbar}
-          message="Su trabajo pasó a 'En Proceso', puede finalizarlo manualmente"
+          message="El trabajo ha sido actualizado."
           action={
             <Button color="inherit" size="small" onClick={handleCloseSnackbar}>
+              OK
+            </Button>
+          }
+        />
+        <Snackbar
+          open={openRateSnackbar}
+          autoHideDuration={6000}
+          onClose={handleCloseRateSnackbar}
+          message="Esta funcionalidad se implementará pronto."
+          action={
+            <Button color="inherit" size="small" onClick={handleCloseRateSnackbar}>
               OK
             </Button>
           }
