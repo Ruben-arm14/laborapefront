@@ -94,7 +94,7 @@ const Historial = () => {
                 <h2>{historialItem.trabajo.titulo}</h2>
                 <p>{historialItem.trabajo.descripcion}</p>
                 <p><strong>Ubicación:</strong> {historialItem.trabajo.ubicacion}</p>
-                <p><strong>Fecha:</strong> {historialItem.trabajo.fecha}</p>
+                <p><strong>Fecha Límite:</strong> {new Date(historialItem.trabajo.fechaLimite).toLocaleDateString()}</p>
                 <p><strong>Presupuesto:</strong> {historialItem.presupuesto}</p>
                 <p><strong>Estado:</strong> {historialItem.estado}</p>
                 {historialItem.estado === 'EN_PROCESO' && (
