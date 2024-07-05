@@ -14,7 +14,6 @@ const ResetPasswordForm = () => {
     e.preventDefault();
     setError(null);
 
-    // Validación básica (puedes agregar más validaciones según tus requisitos)
     if (!formData.email || !formData.Newpassword || !formData.Repetirpassword) {
       setError("Por favor, complete todos los campos.");
       return;
@@ -26,22 +25,18 @@ const ResetPasswordForm = () => {
     }
 
     try {
-      const response = await fetch("/api/reset-password", { // Reemplaza con tu endpoint real
+      const response = await fetch("http://localhost:8080/usuarios/reset-password", { // Reemplaza con tu endpoint real
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
       });
       if (response.ok) {
-        // Restablecimiento de contraseña exitoso
-        const data = await response.json();
         router.push("/login");
       } else {
-        // Error en el restablecimiento de contraseña
         const errorData = await response.json();
         setError(errorData.message || "Ocurrió un error al restablecer la contraseña.");
       }
     } catch (error) {
-      // Error en la conexión o en el servidor
       setError("Ocurrió un error. Por favor, inténtelo de nuevo más tarde.");
       console.error(error);
     }
@@ -53,9 +48,7 @@ const ResetPasswordForm = () => {
         <p className="title">LaboraPE</p>
         <form onSubmit={handleSubmit}>
           <div className="form_group">
-            <label className="sub_title" htmlFor="email">
-              Email
-            </label>
+            <label className="sub_title" htmlFor="email">Email</label>
             <input
               placeholder="Ingrese su email"
               id="email"
@@ -67,9 +60,7 @@ const ResetPasswordForm = () => {
             />
           </div>
           <div className="form_group">
-            <label className="sub_title" htmlFor="Newpassword">
-              Nueva Contraseña
-            </label>
+            <label className="sub_title" htmlFor="Newpassword">Nueva Contraseña</label>
             <input
               placeholder="Ingrese su nueva contraseña"
               id="Newpassword"
@@ -81,9 +72,7 @@ const ResetPasswordForm = () => {
             />
           </div>
           <div className="form_group">
-            <label className="sub_title" htmlFor="Repetirpassword">
-              Repetir Contraseña
-            </label>
+            <label className="sub_title" htmlFor="Repetirpassword">Repetir Contraseña</label>
             <input
               placeholder="Repita su nueva contraseña"
               id="Repetirpassword"
@@ -95,9 +84,7 @@ const ResetPasswordForm = () => {
             />
           </div>
           <div>
-            <button className="btn" type="submit">
-              RESTABLECER CONTRASEÑA
-            </button>
+            <button className="btn" type="submit">RESTABLECER CONTRASEÑA</button>
             {error && <p className="error-message">{error}</p>}
           </div>
         </form>
@@ -106,4 +93,4 @@ const ResetPasswordForm = () => {
   );
 };
 
-export default ResetPasswordForm; 
+export default ResetPasswordForm;
