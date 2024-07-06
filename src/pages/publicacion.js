@@ -1,14 +1,23 @@
 import React, { useState, useContext, useEffect } from "react";
 import { useRouter } from "next/router";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 import LogoBar from "@/components/layout/LogoBar";
 import { AppContext } from "@/context/AppContext";
 import styles from '@/styles/global/Formulario.module.css';
+import Snackbar from '@mui/material/Snackbar';
+import MuiAlert from '@mui/material/Alert';
+
+const Alert = React.forwardRef(function Alert(props, ref) {
+  return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
+});
 
 const Formulario = () => {
   const router = useRouter();
   const { user, setUser } = useContext(AppContext);
   const [error, setError] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
   const [formData, setFormData] = useState({
     titulo: "",
     descripcion: "",
@@ -18,6 +27,8 @@ const Formulario = () => {
     ubicacion: "",
     presupuesto: "",
   });
+
+  const [selectedDate, setSelectedDate] = useState(null);
 
   useEffect(() => {
     const storedUser = sessionStorage.getItem('usuario');
@@ -37,6 +48,11 @@ const Formulario = () => {
     setFormData((prevState) => ({ ...prevState, imagen: file }));
   };
 
+  const handleDateChange = (date) => {
+    setSelectedDate(date);
+    setFormData((prevState) => ({ ...prevState, fechafin: date }));
+  };
+
   const handleSubmit = async (event) => {
     event.preventDefault();
     setError(null);
@@ -48,14 +64,13 @@ const Formulario = () => {
       return;
     }
 
-    // Verificar si el rol del usuario es "CLIENTE"
     if (user.rol !== 'CLIENTE') {
       setError("Solo los usuarios con rol CLIENTE pueden publicar actividades.");
       setIsLoading(false);
       return;
     }
 
-    const idcliente = user.idusuario; // Asegúrate de que este es el ID correcto
+    const idcliente = user.idusuario;
 
     const fechaFinISO = formData.fechafin
       ? new Date(formData.fechafin).toISOString().replace(':', '%3A')
@@ -86,8 +101,7 @@ const Formulario = () => {
       setIsLoading(false);
 
       if (response.ok) {
-        alert("La actividad se ha enviado correctamente y está en revisión");
-        router.push("/MisTrabajos");
+        setSuccess(true);
         setFormData({
           titulo: "",
           descripcion: "",
@@ -97,6 +111,9 @@ const Formulario = () => {
           ubicacion: "",
           presupuesto: "",
         });
+        setTimeout(() => {
+          router.push("/MisTrabajos");
+        }, 2000); // Redirigir después de 2 segundos
       } else {
         const errorData = await response.json();
         setError(errorData.error || "Error al enviar la actividad");
@@ -107,11 +124,9 @@ const Formulario = () => {
     }
   };
 
-  // Calcular la fecha mínima y máxima
-  const minDate = new Date().toISOString().split("T")[0];
+  const minDate = new Date();
   const maxDate = new Date();
   maxDate.setDate(maxDate.getDate() + 2);
-  const maxDateString = maxDate.toISOString().split("T")[0];
 
   return (
     <div className={styles.bodyNoMargin}>
@@ -146,7 +161,9 @@ const Formulario = () => {
           <div className={styles.formGroup}>
             <label htmlFor="imagen">Subir imagen:</label>
             <input type="file" id="imagen" name="imagen" accept="image/*" onChange={handleImageChange} />
-            <label htmlFor="imagen" className={styles.fileLabel}>Seleccionar archivo</label>
+            <label htmlFor="imagen" className={`${styles.fileLabel} ${formData.imagen ? styles.fileLabelUploaded : ''}`}>
+              {formData.imagen ? 'Archivo seleccionado' : 'Seleccionar archivo'}
+            </label>
           </div>
           <div className={styles.formGroup}>
             <label htmlFor="categoria">Categoría:</label>
@@ -161,7 +178,18 @@ const Formulario = () => {
           </div>
           <div className={styles.formGroup}>
             <label htmlFor="fechafin">Disponibilidad de la tarea:</label>
-            <input type="datetime-local" id="fechafin" name="fechafin" value={formData.fechafin} onChange={handleInputChange} min={minDate} max={maxDateString} className={styles.dateInput} />
+            <DatePicker
+              selected={selectedDate}
+              onChange={handleDateChange}
+              showTimeSelect
+              timeFormat="HH:mm"
+              timeIntervals={15}
+              dateFormat="dd/MM/yyyy HH:mm"
+              minDate={minDate}
+              maxDate={maxDate}
+              className={styles.dateInput}
+              placeholderText="Selecciona fecha y hora"
+            />
           </div>
           <button type="submit" className={styles.submitButton} disabled={isLoading}>
             {isLoading ? 'Enviando...' : 'Enviar'}
@@ -169,6 +197,16 @@ const Formulario = () => {
           {error && <p className={styles.error}>{error}</p>}
         </form>
       </div>
+      <Snackbar open={success} autoHideDuration={6000} onClose={() => setSuccess(false)}>
+        <Alert onClose={() => setSuccess(false)} severity="success">
+          La actividad se ha enviado correctamente y está en revisión.
+        </Alert>
+      </Snackbar>
+      <Snackbar open={!!error} autoHideDuration={6000} onClose={() => setError(null)}>
+        <Alert onClose={() => setError(null)} severity="error">
+          {error}
+        </Alert>
+      </Snackbar>
     </div>
   );
 };

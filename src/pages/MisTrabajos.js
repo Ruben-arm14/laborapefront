@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { Box, Grid, Alert, MenuItem, Select, FormControl, InputLabel, Pagination, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Button, Snackbar } from '@mui/material';
+import EditarTrabajoModal from '@/components/trabajos/EditarTrabajoModal';
 import MisTrabajosCard from '@/components/trabajos/MisTrabajosCard';
 import LogoBar from '@/components/layout/LogoBar';
 import { AppContext } from '@/context/AppContext';
@@ -117,7 +118,7 @@ const MisTrabajos = () => {
     try {
       // Actualizar el estado del trabajo a "EN_PROCESO"
       await actualizarEstadoTrabajo(idtrabajo, 'EN_PROCESO');
-  
+
       // Obtener la información del freelancer
       const response = await fetch(`http://localhost:8080/freelancers/trabajo/${idtrabajo}/detalle`);
       if (!response.ok) {
@@ -131,7 +132,7 @@ const MisTrabajos = () => {
       setError(err.message);
     }
   };
-  
+
   const handleCloseFreelancerModal = () => {
     setOpenFreelancerModal(false);
     setFreelancerInfo(null);

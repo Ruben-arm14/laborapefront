@@ -89,7 +89,11 @@
   margin-top: 5px;
   margin-bottom: 5px;
   text-align: center;
-  width: 100%;
+  width: 96%;
+}
+
+.fileLabelUploaded {
+  background-color: #28a745;
 }
 
 .formGroup input[type="file"] {
