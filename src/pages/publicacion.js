@@ -53,6 +53,34 @@ const Formulario = () => {
     setFormData((prevState) => ({ ...prevState, fechafin: date }));
   };
 
+  const validateForm = () => {
+    if (!formData.titulo || formData.titulo.length > 25) {
+      setError("El nombre de la tarea debe ser menor o igual a 25 caracteres y no puede estar vacío.");
+      return false;
+    }
+    if (!formData.descripcion || formData.descripcion.length > 150) {
+      setError("La descripción de la tarea debe ser menor o igual a 150 caracteres y no puede estar vacía.");
+      return false;
+    }
+    if (!formData.ubicacion || formData.ubicacion.length > 50) {
+      setError("La dirección debe ser menor o igual a 50 caracteres y no puede estar vacía.");
+      return false;
+    }
+    if (!formData.presupuesto || isNaN(formData.presupuesto) || parseFloat(formData.presupuesto) < 0) {
+      setError("El presupuesto debe ser un número positivo.");
+      return false;
+    }
+    if (!formData.imagen) {
+      setError("Debes subir una imagen.");
+      return false;
+    }
+    if (formData.categoria === "Selecciona") {
+      setError("Debes seleccionar una categoría.");
+      return false;
+    }
+    return true;
+  };
+
   const handleSubmit = async (event) => {
     event.preventDefault();
     setError(null);
@@ -66,6 +94,11 @@ const Formulario = () => {
 
     if (user.rol !== 'CLIENTE') {
       setError("Solo los usuarios con rol CLIENTE pueden publicar actividades.");
+      setIsLoading(false);
+      return;
+    }
+
+    if (!validateForm()) {
       setIsLoading(false);
       return;
     }
