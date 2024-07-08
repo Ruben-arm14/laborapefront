@@ -12,7 +12,7 @@ const VerPropuestas = () => {
 
   useEffect(() => {
     if (user && user.idusuario) {
-      const clienteId = sessionStorage.getItem('idcliente');
+      const clienteId = sessionStorage.getItem('clienteId');
       console.log("Fetching propuestas for clienteId:", clienteId);
       const fetchPropuestas = async () => {
         try {
@@ -45,7 +45,7 @@ const VerPropuestas = () => {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
         // Volver a cargar las propuestas
-        const clienteId = sessionStorage.getItem('idcliente');
+        const clienteId = sessionStorage.getItem('clienteId');
         const fetchPropuestas = async () => {
           try {
             const response = await fetch(`http://localhost:8080/postulaciones/cliente/${clienteId}`);
@@ -76,7 +76,7 @@ const VerPropuestas = () => {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
       // Volver a cargar las propuestas
-      const clienteId = sessionStorage.getItem('idcliente');
+      const clienteId = sessionStorage.getItem('clienteId');
       const fetchPropuestas = async () => {
         try {
           const response = await fetch(`http://localhost:8080/postulaciones/cliente/${clienteId}`);

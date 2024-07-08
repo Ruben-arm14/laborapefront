@@ -5,7 +5,7 @@ import { AppContext } from '@/context/AppContext';
 import styles from '@/styles/global/historial.module.css';
 
 const Historial = () => {
-  const { user } = useContext(AppContext);
+  const { user, freelancerId } = useContext(AppContext);
   const [historial, setHistorial] = useState([]);
   const [filtro, setFiltro] = useState('todos');
   const [loading, setLoading] = useState(true);
@@ -14,10 +14,10 @@ const Historial = () => {
   const [clienteInfo, setClienteInfo] = useState(null);
 
   useEffect(() => {
-    if (user && user.idfreelancer) {
+    if (user && freelancerId) {
       const fetchHistorial = async () => {
         try {
-          const response = await fetch(`http://localhost:8080/postulaciones/freelancer/${user.idfreelancer}`);
+          const response = await fetch(`http://localhost:8080/postulaciones/freelancer/${freelancerId}`);
           if (!response.ok) {
             throw new Error(`Error HTTP! status: ${response.status}`);
           }
@@ -31,7 +31,7 @@ const Historial = () => {
       };
       fetchHistorial();
     }
-  }, [user]);
+  }, [user, freelancerId]);
 
   const handleFiltroChange = (event, newValue) => {
     setFiltro(newValue);

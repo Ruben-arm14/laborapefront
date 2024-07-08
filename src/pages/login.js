@@ -6,7 +6,7 @@ import styles from "@/styles/global/login.module.css";
 
 const LoginForm = () => {
   const router = useRouter();
-  const { setUser, setClienteId } = useContext(AppContext);
+  const { setUser, setClienteId, setFreelancerId } = useContext(AppContext);
   const [formData, setFormData] = useState({ correo: "", contrasenia: "" });
   const [error, setError] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -37,11 +37,20 @@ const LoginForm = () => {
         
         if (userData.usuario.rol === 'CLIENTE') {
           setClienteId(userData.idcliente);
-          sessionStorage.setItem('idcliente', userData.idcliente);
+          sessionStorage.setItem('clienteId', userData.idcliente);
           router.push('/publicacion');
         } else if (userData.usuario.rol === 'FREELANCER') {
-          router.push('/trabajosFreelancer');
-        } else if (userData.usuario.rol === 'ADMIN') {
+    const freelancerResponse = await fetch(`http://localhost:8080/usuarios/perfilfreelancer/${userData.usuario.idusuario}`);
+    if (freelancerResponse.ok) {
+        const freelancerData = await freelancerResponse.json();
+        setFreelancerId(freelancerData.idfreelancer);
+        sessionStorage.setItem('freelancerId', freelancerData.idfreelancer);
+        router.push('/trabajosFreelancer');
+    } else {
+        setError("Error al obtener datos del freelancer.");
+    }
+}
+ else if (userData.usuario.rol === 'ADMIN') {
           router.push('/trabajosadmin');
         }
       } else {

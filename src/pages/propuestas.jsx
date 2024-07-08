@@ -5,7 +5,7 @@ import { AppContext } from '@/context/AppContext';
 import styles from '@/styles/global/verPropuestas.module.css';
 
 const Propuestas = () => {
-  const { user } = useContext(AppContext);
+  const { user, freelancerId } = useContext(AppContext);
   const [propuestas, setPropuestas] = useState([]);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(false);
@@ -18,26 +18,28 @@ const Propuestas = () => {
   const itemsPerPage = 5;
 
   useEffect(() => {
-    if (!user || !user.idfreelancer) {
+    if (!user || !freelancerId) {
       setError("Debes iniciar sesión para ver tus postulaciones.");
       return;
     }
 
     const fetchPropuestas = async () => {
       try {
-        const response = await fetch(`http://localhost:8080/postulaciones/freelancer/${user.idfreelancer}`);
+        console.log("Realizando solicitud a la API con freelancerId:", freelancerId);
+        const response = await fetch(`http://localhost:8080/postulaciones/freelancer/${freelancerId}`);
         if (!response.ok) {
           throw new Error("Error HTTP! status: " + response.status);
         }
         const data = await response.json();
         setPropuestas(data);
+        setError(null); // Clear error if data fetch is successful
       } catch (err) {
         setError(err.message);
       }
     };
 
     fetchPropuestas();
-  }, [user]);
+  }, [user, freelancerId]);
 
   const handleCancel = async (propuestaId) => {
     try {
@@ -109,6 +111,7 @@ const Propuestas = () => {
       <LogoBarFreelance />
       <div className={styles.container}>
         <h1 className={styles.title}>Mis Postulaciones</h1>
+        {error && <Alert severity="error">{error}</Alert>}
         <Tabs
           value={filter}
           onChange={handleFilterChange}
@@ -121,7 +124,6 @@ const Propuestas = () => {
           <Tab label={`Rechazado (${getCountByState('RECHAZADO')})`} value="RECHAZADO" />
         </Tabs>
         <Box className={styles.propuestasWrapper}>
-          {error && <Alert severity="error">{error}</Alert>}
           <Snackbar
             open={success}
             autoHideDuration={6000}
