@@ -9,15 +9,11 @@
   padding-top: 50px;
 }
 
-.filterContainer {
+.tabsContainer {
   margin-bottom: 20px;
   display: flex;
   justify-content: center;
   align-items: center;
-}
-
-.formControl {
-  min-width: 200px;
 }
 
 .trabajosContainer {

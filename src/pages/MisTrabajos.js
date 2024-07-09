@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { Box, Grid, Alert, MenuItem, Select, FormControl, InputLabel, Pagination, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Button, Snackbar } from '@mui/material';
+import { Box, Grid, Alert, Tabs, Tab, Snackbar, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Button, TextField, Pagination } from '@mui/material';
 import EditarTrabajoModal from '@/components/trabajos/EditarTrabajoModal';
 import MisTrabajosCard from '@/components/trabajos/MisTrabajosCard';
 import LogoBar from '@/components/layout/LogoBar';
 import { AppContext } from '@/context/AppContext';
+import Rating from '@mui/material/Rating';
 import styles from '@/styles/global/misTrabajos.module.css';
 
 const MisTrabajos = () => {
@@ -16,9 +17,12 @@ const MisTrabajos = () => {
   const [openFreelancerModal, setOpenFreelancerModal] = useState(false);
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [openFinalizeModal, setOpenFinalizeModal] = useState(false);
+  const [openRateDialog, setOpenRateDialog] = useState(false);
   const [openRateSnackbar, setOpenRateSnackbar] = useState(false);
   const [page, setPage] = useState(1);
   const [estadoFiltro, setEstadoFiltro] = useState('EN_REVISION'); // Estado por defecto
+  const [rating, setRating] = useState(0);
+  const [comment, setComment] = useState('');
   const itemsPerPage = 4;
 
   useEffect(() => {
@@ -157,8 +161,56 @@ const MisTrabajos = () => {
     }
   };
 
-  const handleRate = () => {
-    setOpenRateSnackbar(true);
+  const handleRate = async (trabajo) => {
+    try {
+      const response = await fetch(`http://localhost:8080/trabajos/${trabajo.idtrabajo}/freelancer`);
+      if (!response.ok) {
+        throw new Error("Error al obtener freelancer");
+      }
+      const freelancerData = await response.json();
+      setTrabajoParaContacto(trabajo);
+      setFreelancerInfo(freelancerData);
+      setOpenRateDialog(true);
+    } catch (err) {
+      setError(err.message);
+    }
+  };
+
+  const handleSubmitRate = async () => {
+    try {
+      const response = await fetch('http://localhost:8080/calificaciones', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          idtrabajo: trabajoParaContacto.idtrabajo,
+          idusuario: user.idusuario,
+          idfreelancer: freelancerInfo.idfreelancer,
+          calificacion: rating,
+          comentario: comment
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error("Error al enviar la calificación");
+      }
+
+      await actualizarEstadoTrabajo(trabajoParaContacto.idtrabajo, 'CALIFICADO');
+
+      setOpenRateDialog(false);
+      setOpenRateSnackbar(true);
+    } catch (err) {
+      setError(err.message);
+    }
+  };
+
+  const handleCloseRateDialog = () => {
+    setOpenRateDialog(false);
+  };
+
+  const handleCloseRateSnackbar = () => {
+    setOpenRateSnackbar(false);
   };
 
   const handleSave = (updatedTrabajo) => {
@@ -168,20 +220,12 @@ const MisTrabajos = () => {
     ));
   };
 
-  const handlePageChange = (event, value) => {
-    setPage(value);
-  };
-
-  const handleEstadoChange = (event) => {
-    setEstadoFiltro(event.target.value);
+  const handleEstadoChange = (event, newValue) => {
+    setEstadoFiltro(newValue);
   };
 
   const handleCloseSnackbar = () => {
     setOpenSnackbar(false);
-  };
-
-  const handleCloseRateSnackbar = () => {
-    setOpenRateSnackbar(false);
   };
 
   const paginatedTrabajos = trabajos.slice((page - 1) * itemsPerPage, page * itemsPerPage);
@@ -191,24 +235,21 @@ const MisTrabajos = () => {
       <LogoBar />
       <div className={styles.container}>
         <h1 className={styles.title}>Mis Trabajos</h1>
-        <div className={styles.filterContainer}>
-          <FormControl variant="outlined" className={styles.formControl}>
-            <InputLabel id="estado-filter-label">Estado</InputLabel>
-            <Select
-              labelId="estado-filter-label"
-              value={estadoFiltro}
-              onChange={handleEstadoChange}
-              label="Estado"
-            >
-              <MenuItem value="EN_REVISION">En Revisión</MenuItem>
-              <MenuItem value="RECHAZADO">Rechazado</MenuItem>
-              <MenuItem value="PUBLICADO">Publicado</MenuItem>
-              <MenuItem value="ACEPTADO">Aceptado</MenuItem>
-              <MenuItem value="EN_PROCESO">En Proceso</MenuItem>
-              <MenuItem value="FINALIZADO">Finalizado</MenuItem>
-            </Select>
-          </FormControl>
-        </div>
+        <Tabs
+          value={estadoFiltro}
+          onChange={handleEstadoChange}
+          indicatorColor="primary"
+          textColor="primary"
+          centered
+        >
+          <Tab label="EN REVISIÓN" value="EN_REVISION" />
+          <Tab label="PUBLICADO" value="PUBLICADO" />
+          <Tab label="RECHAZADO" value="RECHAZADO" />
+          <Tab label="ACEPTADO" value="ACEPTADO" />
+          <Tab label="EN PROCESO" value="EN_PROCESO" />
+          <Tab label="FINALIZADO" value="FINALIZADO" />
+          <Tab label="CALIFICADO" value="CALIFICADO" />
+        </Tabs>
         <Box className={styles.trabajosContainer}>
           {error && <Alert severity="error">{error}</Alert>}
           {trabajos.length === 0 && !error && (
@@ -226,7 +267,7 @@ const MisTrabajos = () => {
                   onDelete={handleDelete}
                   onContact={() => handleContact(trabajo.idtrabajo)}
                   onFinalize={() => handleFinalize(trabajo)}
-                  onRate={handleRate}
+                  onRate={() => handleRate(trabajo)}
                 />
               </Grid>
             ))}
@@ -235,7 +276,7 @@ const MisTrabajos = () => {
         <Pagination
           count={Math.ceil(trabajos.length / itemsPerPage)}
           page={page}
-          onChange={handlePageChange}
+          onChange={(event, value) => setPage(value)}
           className={styles.pagination}
         />
         {trabajoParaEditar && (
@@ -287,6 +328,41 @@ const MisTrabajos = () => {
             </DialogActions>
           </Dialog>
         )}
+        {trabajoParaContacto && (
+          <Dialog open={openRateDialog} onClose={handleCloseRateDialog}>
+            <DialogTitle>Calificar Freelancer</DialogTitle>
+            <DialogContent>
+              <DialogContentText>
+                Por favor, califica el trabajo realizado por el freelancer.
+              </DialogContentText>
+              <Rating
+                name="rating"
+                value={rating}
+                onChange={(event, newValue) => {
+                  setRating(newValue);
+                }}
+              />
+              <TextField
+                autoFocus
+                margin="dense"
+                id="comment"
+                label="Comentario"
+                type="text"
+                fullWidth
+                value={comment}
+                onChange={(e) => setComment(e.target.value)}
+              />
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={handleCloseRateDialog} color="primary">
+                Cancelar
+              </Button>
+              <Button onClick={handleSubmitRate} color="primary">
+                Enviar
+              </Button>
+            </DialogActions>
+          </Dialog>
+        )}
         <Snackbar
           open={openSnackbar}
           autoHideDuration={6000}
@@ -302,7 +378,7 @@ const MisTrabajos = () => {
           open={openRateSnackbar}
           autoHideDuration={6000}
           onClose={handleCloseRateSnackbar}
-          message="Esta funcionalidad se implementará pronto."
+          message="Calificación enviada."
           action={
             <Button color="inherit" size="small" onClick={handleCloseRateSnackbar}>
               OK

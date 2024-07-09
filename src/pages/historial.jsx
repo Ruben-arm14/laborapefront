@@ -3,6 +3,7 @@ import LogoBarFreelance from '@/components/layout/LogoBarFreelance';
 import { Box, Grid, Tabs, Tab, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Button, Typography } from '@mui/material';
 import { AppContext } from '@/context/AppContext';
 import styles from '@/styles/global/historial.module.css';
+import Rating from '@mui/material/Rating';
 
 const Historial = () => {
   const { user, freelancerId } = useContext(AppContext);
@@ -11,6 +12,8 @@ const Historial = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [open, setOpen] = useState(false);
+  const [openCalificacion, setOpenCalificacion] = useState(false);
+  const [calificacionInfo, setCalificacionInfo] = useState(null);
   const [clienteInfo, setClienteInfo] = useState(null);
 
   useEffect(() => {
@@ -56,7 +59,35 @@ const Historial = () => {
     setClienteInfo(null);
   };
 
-  // Filtrar propuestas para mostrar solo las que están en los estados EN_PROCESO y TERMINADO
+  const handleViewCalificacion = async (trabajoId) => {
+    try {
+      const response = await fetch(`http://localhost:8080/calificaciones/trabajo/${trabajoId}`);
+      if (!response.ok) {
+        if (response.status === 404) {
+          // No hay calificaciones
+          setCalificacionInfo(null);
+        } else {
+          throw new Error('Failed to fetch calificación details');
+        }
+      } else {
+        const calificacionData = await response.json();
+        if (calificacionData.length > 0) {
+          setCalificacionInfo(calificacionData[0]); // Tomar la primera calificación de la lista
+        } else {
+          setCalificacionInfo(null);
+        }
+      }
+      setOpenCalificacion(true);
+    } catch (err) {
+      setError(err.message);
+    }
+  };
+
+  const handleCloseCalificacion = () => {
+    setOpenCalificacion(false);
+    setCalificacionInfo(null);
+  };
+
   const filteredHistorial = historial.filter(item =>
     filtro === 'todos'
       ? item.estado === 'EN_PROCESO' || item.estado === 'TERMINADO'
@@ -108,7 +139,13 @@ const Historial = () => {
                 )}
               </div>
               {historialItem.estado === 'TERMINADO' && (
-                <button className={styles.resenaButton}>Escribir Reseña</button>
+                <Button
+                  variant="contained"
+                  color="primary"
+                  onClick={() => handleViewCalificacion(historialItem.trabajo.idtrabajo)}
+                >
+                  Ver Calificación
+                </Button>
               )}
             </Grid>
           ))}
@@ -136,6 +173,26 @@ const Historial = () => {
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClose} color="primary">
+            Cerrar
+          </Button>
+        </DialogActions>
+      </Dialog>
+      <Dialog open={openCalificacion} onClose={handleCloseCalificacion}>
+        <DialogTitle>Calificación del Trabajo</DialogTitle>
+        <DialogContent>
+          {calificacionInfo ? (
+            <>
+              <Typography variant="h6">Calificación:</Typography>
+              <Rating name="read-only" value={calificacionInfo.calificacion} readOnly />
+              <Typography variant="h6">Comentario:</Typography>
+              <DialogContentText>{calificacionInfo.comentario}</DialogContentText>
+            </>
+          ) : (
+            <Typography variant="body1">Todavía no fue calificado por el cliente.</Typography>
+          )}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseCalificacion} color="primary">
             Cerrar
           </Button>
         </DialogActions>

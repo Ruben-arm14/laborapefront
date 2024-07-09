@@ -43,6 +43,10 @@ const MisTrabajosCard = ({ trabajo, onEdit, onDelete, onContact, onFinalize, onR
         return (
           <button className={styles.rateButton} onClick={() => onRate(trabajo.idtrabajo)}>Calificar</button>
         );
+      case 'CALIFICADO':
+        return (
+          <p>Este trabajo ya fue calificado</p>
+        );
       default:
         return null;
     }
