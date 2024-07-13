@@ -1,5 +1,9 @@
 import React, { useEffect, useState, useContext } from 'react';
-import { Box, Button, TextField, Select, MenuItem, InputLabel, FormControl } from '@mui/material';
+import { Box, Button, TextField, IconButton, InputAdornment } from '@mui/material';
+import { Visibility, VisibilityOff } from '@mui/icons-material';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import { useRouter } from 'next/router';
 import styles from '@/styles/global/perfilcliente.module.css';
 import LogoBar from '@/components/layout/LogoBar';
 import { AppContext } from "@/context/AppContext";
@@ -9,6 +13,7 @@ const PerfilCliente = () => {
   const [perfil, setPerfil] = useState(null);
   const [editMode, setEditMode] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const [formPerfil, setFormPerfil] = useState({
     nombre: "",
     edad: "",
@@ -19,6 +24,7 @@ const PerfilCliente = () => {
     imagen: null,
     imagenUrl: ""
   });
+  const router = useRouter();
 
   useEffect(() => {
     const fetchPerfil = async (idUsuario) => {
@@ -98,36 +104,97 @@ const PerfilCliente = () => {
       if (response.ok) {
         const data = await response.json();
         setPerfil(data);
-        alert("Perfil actualizado correctamente");
+        toast.success("Perfil actualizado correctamente", {
+          position: "top-right",
+          autoClose: 5000,
+          className: styles.toastSuccess,
+          hideProgressBar: true,
+        });
         setEditMode(false);
       } else {
         const errorData = await response.json();
-        alert(`Error al guardar el perfil: ${errorData.error || "Error desconocido"}`);
+        toast.error(`Error al guardar el perfil: ${errorData.error || "Error desconocido"}`, {
+          position: "top-right",
+          autoClose: 5000,
+          className: styles.toastError,
+          hideProgressBar: true,
+        });
       }
     } catch (error) {
-      alert(`Error al guardar el perfil: ${error.message}`);
+      toast.error(`Error al guardar el perfil: ${error.message}`, {
+        position: "top-right",
+        autoClose: 5000,
+        className: styles.toastError,
+        hideProgressBar: true,
+      });
       console.error(error);
     } finally {
       setIsLoading(false);
     }
   };
 
+  const handleClickShowPassword = () => {
+    setShowPassword(!showPassword);
+  };
+
+  const handleRegresar = () => {
+    setEditMode(false);
+  };
+
   return (
     <div className={styles.container}>
       <LogoBar />
+      <ToastContainer />
       {perfil && (
         <div className={styles.perfilContainer}>
-          <img 
-            src={formPerfil.imagenUrl || "/images/default-profile.png"} 
-            alt="Imagen del perfil" 
-            className={styles.perfilImage} 
-          />
+          <div className={styles.imageSection}>
+            <img 
+              src={formPerfil.imagenUrl || "/images/default-profile.png"} 
+              alt="Imagen del perfil" 
+              className={styles.perfilImage} 
+            />
+            <p>{perfil.nombre}</p>
+          </div>
           {editMode ? (
-            <form>
+            <form className={styles.formSection}>
               <TextField
-                label="Nombre"
-                name="nombre"
-                value={formPerfil.nombre}
+                label="Email"
+                name="email"
+                type="email"
+                value={formPerfil.email}
+                onChange={handleChange}
+                fullWidth
+                required
+                margin="normal"
+              />
+              <TextField
+                label="Contraseña"
+                name="contrasena"
+                type={showPassword ? 'text' : 'password'}
+                value={formPerfil.contrasena}
+                onChange={handleChange}
+                fullWidth
+                required
+                margin="normal"
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton
+                        aria-label="toggle password visibility"
+                        onClick={handleClickShowPassword}
+                        edge="end"
+                      >
+                        {showPassword ? <VisibilityOff /> : <Visibility />}
+                      </IconButton>
+                    </InputAdornment>
+                  )
+                }}
+              />
+              <TextField
+                label="Número"
+                name="numero"
+                type="text"
+                value={formPerfil.numero}
                 onChange={handleChange}
                 fullWidth
                 required
@@ -143,96 +210,66 @@ const PerfilCliente = () => {
                 margin="normal"
                 disabled // Deshabilitar el cambio de edad
               />
-              <FormControl fullWidth margin="normal" disabled>
-                <InputLabel>Sexo</InputLabel>
-                <Select
-                  name="sexo"
-                  value={formPerfil.sexo}
-                  required
+              <TextField
+                label="Sexo"
+                name="sexo"
+                value={formPerfil.sexo}
+                fullWidth
+                required
+                margin="normal"
+                disabled // Deshabilitar el cambio de sexo
+              />
+              <div className={styles.buttonGroup}>
+                <label htmlFor="raised-button-file">
+                  <Button variant="contained" component="span" className={styles.uploadButton}>
+                    Subir Imagen
+                  </Button>
+                </label>
+                <input
+                  accept="image/*"
+                  type="file"
+                  onChange={handleImageChange}
+                  style={{ display: 'none' }}
+                  id="raised-button-file"
+                />
+                <Button
+                  variant="contained"
+                  color="primary"
+                  onClick={handleGuardarPerfil}
+                  disabled={isLoading}
+                  className={styles.saveButton}
                 >
-                  <MenuItem value="Hombre">Hombre</MenuItem>
-                  <MenuItem value="Mujer">Mujer</MenuItem>
-                </Select>
-              </FormControl>
-              <TextField
-                label="Email"
-                name="email"
-                type="email"
-                value={formPerfil.email}
-                onChange={handleChange}
-                fullWidth
-                required
-                margin="normal"
-              />
-              <TextField
-                label="Número"
-                name="numero"
-                type="text"
-                value={formPerfil.numero}
-                onChange={handleChange}
-                fullWidth
-                required
-                margin="normal"
-              />
-              <TextField
-                label="Contraseña"
-                name="contrasena"
-                type="password"
-                value={formPerfil.contrasena}
-                onChange={handleChange}
-                fullWidth
-                required
-                margin="normal"
-              />
-              <TextField
-                label="Rol"
-                name="rol"
-                value={perfil.rol}
-                fullWidth
-                required
-                margin="normal"
-                disabled // Deshabilitar el cambio de rol
-              />
-              <input
-                accept="image/*"
-                type="file"
-                onChange={handleImageChange}
-                style={{ display: 'none' }}
-                id="raised-button-file"
-              />
-              <label htmlFor="raised-button-file">
-                <Button variant="contained" component="span" className={styles.uploadButton}>
-                  Subir Imagen
+                  {isLoading ? 'Guardando...' : 'Guardar Perfil'}
                 </Button>
-              </label>
-              <Button
-                variant="contained"
-                color="primary"
-                onClick={handleGuardarPerfil}
-                disabled={isLoading}
-                className={styles.fullWidthButton}
-              >
-                {isLoading ? 'Guardando...' : 'Guardar Perfil'}
-              </Button>
+                <Button
+                  variant="contained"
+                  color="secondary"
+                  onClick={handleRegresar}
+                  className={styles.regresarButton}
+                >
+                  Regresar
+                </Button>
+              </div>
             </form>
           ) : (
-            <div>
+            <div className={styles.formSection}>
               <div className={styles.perfilDetails}>
-                <p>Nombre: {perfil.nombre}</p>
+                <p>Email: {perfil.correo}</p>
+                <p>Contraseña: ********</p>
+                <p>Número: {perfil.numero}</p>
                 <p>Edad: {perfil.edad}</p>
                 <p>Sexo: {perfil.sexo}</p>
-                <p>Email: {perfil.correo}</p>
-                <p>Número: {perfil.numero}</p>
-                <p>Rol: {perfil.rol}</p> {/* Mostrar el rol */}
               </div>
-              <Button
-                variant="contained"
-                color="primary"
-                onClick={() => setEditMode(true)}
-                className={styles.fullWidthButton}
-              >
-                Editar Perfil
-              </Button>
+              <div className={styles.buttonGroup}>
+                <Button
+                  variant="contained"
+                  color="primary"
+                  onClick={() => setEditMode(true)}
+                  className={styles.editButton}
+                >
+                  Editar Perfil
+                </Button>
+              </div>
             </div>
           )}
         </div>

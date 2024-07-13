@@ -67,9 +67,12 @@ const LoginForm = () => {
 
   return (
     <div className={styles.container}>
-      <div className={styles.form_area}>
-        <img src="/imagenes/Labora.png" alt="LaboraPE Logo" className={styles.logo} />
-        <form onSubmit={handleSubmit}>
+      <div className={styles.left_side}>
+        <img src="/imagenes/logolaborape.png" alt="LaboraPE Logo" className={styles.logo} />
+      </div>
+      <div className={styles.right_side}>
+        <form onSubmit={handleSubmit} className={styles.form}>
+        <h2 className={styles.title}>Bienvenido a LaboraPE</h2>
           <div className={styles.form_group}>
             <label className={styles.sub_title} htmlFor="correo">
               Email

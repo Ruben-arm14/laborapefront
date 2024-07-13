@@ -1,5 +1,8 @@
 import { useState } from "react";
 import { useRouter } from "next/router";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import styles from "@/styles/global/resetpassword.module.css"; // Asegúrate de que la ruta sea correcta
 
 const ResetPasswordForm = () => {
   const router = useRouter();
@@ -31,7 +34,11 @@ const ResetPasswordForm = () => {
         body: JSON.stringify(formData),
       });
       if (response.ok) {
-        router.push("/login");
+        toast.success("Se cambió con éxito la contraseña", {
+          position: "top-center",  // Aquí se corrige la posición de la notificación
+          autoClose: 5000,
+          onClose: () => router.push("/login")
+        });
       } else {
         const errorData = await response.json();
         setError(errorData.message || "Ocurrió un error al restablecer la contraseña.");
@@ -43,40 +50,44 @@ const ResetPasswordForm = () => {
   };
 
   return (
-    <div className="container">
-      <div className="form_area">
-        <p className="title">LaboraPE</p>
-        <form onSubmit={handleSubmit}>
-          <div className="form_group">
-            <label className="sub_title" htmlFor="email">Email</label>
+    <div className={styles.container}>
+      <ToastContainer />
+      <div className={styles.left_side}>
+        <img src="/imagenes/logolaborape.png" alt="LaboraPE Logo" className={styles.logo} />
+      </div>
+      <div className={styles.right_side}>
+        <form onSubmit={handleSubmit} className={styles.form}>
+          <h2 className={styles.title}>Restablecer Contraseña</h2>
+          <div className={styles.form_group}>
+            <label className={styles.sub_title} htmlFor="email">Email</label>
             <input
               placeholder="Ingrese su email"
               id="email"
-              className="form_style"
+              className={styles.form_style}
               type="email"
               value={formData.email}
               onChange={handleChange}
               required
             />
           </div>
-          <div className="form_group">
-            <label className="sub_title" htmlFor="Newpassword">Nueva Contraseña</label>
+          <div className={styles.form_group}>
+            <label className={styles.sub_title} htmlFor="Newpassword">Nueva Contraseña</label>
             <input
               placeholder="Ingrese su nueva contraseña"
               id="Newpassword"
-              className="form_style"
+              className={styles.form_style}
               type="password"
               value={formData.Newpassword}
               onChange={handleChange}
               required
             />
           </div>
-          <div className="form_group">
-            <label className="sub_title" htmlFor="Repetirpassword">Repetir Contraseña</label>
+          <div className={styles.form_group}>
+            <label className={styles.sub_title} htmlFor="Repetirpassword">Repetir Contraseña</label>
             <input
               placeholder="Repita su nueva contraseña"
               id="Repetirpassword"
-              className="form_style"
+              className={styles.form_style}
               type="password"
               value={formData.Repetirpassword}
               onChange={handleChange}
@@ -84,8 +95,8 @@ const ResetPasswordForm = () => {
             />
           </div>
           <div>
-            <button className="btn" type="submit">RESTABLECER CONTRASEÑA</button>
-            {error && <p className="error-message">{error}</p>}
+            <button className={styles.btn} type="submit">RESTABLECER CONTRASEÑA</button>
+            {error && <p className={styles.errorMessage}>{error}</p>}
           </div>
         </form>
       </div>

@@ -5,8 +5,8 @@
 
 .title {
   font-size: 45px;
-  margin-bottom: 60px;
-  padding-top: 50px;
+  margin-bottom: 20px;
+  padding-top: 80px;
 }
 
 .tabsContainer {
@@ -19,13 +19,15 @@
 .trabajosContainer {
   padding: 20px;
   display: flex;
-  flex-direction: column;
+  flex-wrap: nowrap;  /* Ajusta para no envolver elementos */
+  overflow-x: auto;  /* Permite el desplazamiento horizontal */
   align-items: center;
-  margin-bottom: 50px; 
+  margin-bottom: 10px; 
 }
 
 .trabajoItem {
-  margin-bottom: 20px;
+  min-width: 300px; /* Ajusta según sea necesario */
+  margin: 0 10px; /* Espaciado entre elementos */
 }
 
 .pagination {
@@ -42,7 +44,8 @@
 }
 
 .noTrabajosMessage {
-  margin-top: 20px;
+  margin-top: 100px;
+  margin-left: 800px;
   padding: 20px;
   font-size: 16px;
   color: #555;

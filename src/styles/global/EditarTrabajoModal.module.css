@@ -13,10 +13,10 @@
 
 .modalContent {
     background: white;
-    padding: 20px;
-    border-radius: 10px;
+    padding: 30px;
+    border-radius: 15px;
     width: 80%;
-    max-width: 700px;
+    max-width: 600px;
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
     animation: slideIn 0.3s ease-out;
 }
@@ -34,48 +34,43 @@
 
 .modalTitle {
     margin-top: 0;
-    font-size: 1.5em;
+    font-size: 1.8em;
     text-align: center;
+    margin-bottom: 20px;
 }
 
 .form {
     display: flex;
     flex-direction: column;
+    gap: 15px;
 }
 
 .formGroup {
     display: flex;
-    flex-direction: row;
-    align-items: flex-start;
-    margin-bottom: 15px;
-    padding-left: 10px;
+    flex-direction: column;
+    gap: 5px;
 }
 
 .imageContainer {
     display: flex;
     justify-content: center;
     align-items: center;
-    margin-right: 20px;
+    margin-bottom: 20px;
 }
 
 .image {
-    width: 150px;
-    height: 150px;
-    margin-bottom: 20px;
+    width: 120px;
+    height: 120px;
     object-fit: cover;
+    border-radius: 10px;
 }
 
-.inputs {
-    flex: 1;
-}
-
-.input, .textarea {
+.input, .textarea, .select {
     width: 100%;
     padding: 10px;
     border: 1px solid #ddd;
     border-radius: 5px;
     font-size: 1em;
-    margin-bottom: 10px;
 }
 
 .textarea {
@@ -89,12 +84,13 @@
     margin-top: 20px;
 }
 
-.saveButton, .cancelButton {
+.saveButton, .cancelButton, .uploadButton {
     padding: 10px 20px;
     font-size: 1em;
     border: none;
     border-radius: 5px;
     cursor: pointer;
+    transition: background-color 0.3s ease;
 }
 
 .saveButton {
@@ -102,12 +98,36 @@
     color: white;
 }
 
+.saveButton:hover {
+    background-color: #0056b3;
+}
+
 .cancelButton {
     background-color: #dc3545;
     color: white;
 }
 
+.cancelButton:hover {
+    background-color: #a71d2a;
+}
+
+.uploadButton {
+    background-color: #28a745;
+    color: white;
+    display: inline-block;
+    text-align: center;
+}
+
+.uploadButton:hover {
+    background-color: #218838;
+}
+
 .error {
     color: red;
     font-weight: bold;
+    text-align: center;
+}
+
+.hiddenInput {
+    display: none;
 }

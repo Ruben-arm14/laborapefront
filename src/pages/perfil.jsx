@@ -19,6 +19,7 @@ const Perfil = () => {
     contrasena: "",
     numero: "",
     habilidades: "",
+    imagen: null,
     imagenUrl: "https://via.placeholder.com/150"
   });
 
@@ -54,6 +55,7 @@ const Perfil = () => {
                 contrasena: data.contrasena,
                 numero: data.numero,
                 habilidades: data.habilidades,
+                imagen: null,
                 imagenUrl: data.imagen ? `data:image/png;base64,${data.imagen}` : "https://via.placeholder.com/150"
             });
         })
@@ -69,6 +71,11 @@ const Perfil = () => {
   };
 
   const handleGuardarPerfil = () => {
+    if (!formPerfil.imagen && formPerfil.imagenUrl === "https://via.placeholder.com/150") {
+      toast.error("Debes subir una imagen para guardar el perfil.");
+      return;
+    }
+    
     const idUsuario = user.idusuario;
     const perfilActualizado = {
       nombre: formPerfil.nombre,
@@ -78,7 +85,7 @@ const Perfil = () => {
       contrasena: formPerfil.contrasena,
       numero: formPerfil.numero,
       habilidades: formPerfil.habilidades,
-      imagen: formPerfil.imagen
+      imagen: formPerfil.imagen ? formPerfil.imagen : perfil.imagen
     };
     console.log("Perfil actualizado:", perfilActualizado);
   
@@ -98,27 +105,7 @@ const Perfil = () => {
       setPerfil(formPerfil);
       setEditMode(false);
       toast.success("Se guardo correctamente tus datos");
-      // Recargar el perfil
-      return fetch(`http://localhost:8080/usuarios/perfil/${user.idusuario}`);
-    })
-    .then(response => {
-      if (!response.ok) {
-        throw new Error("Error al recargar el perfil");
-      }
-      return response.json();
-    })
-    .then(data => {
-      setPerfil(data);
-      setFormPerfil({
-        nombre: data.nombre,
-        edad: data.edad,
-        sexo: data.sexo,
-        email: data.correo,
-        contrasena: data.contrasena,
-        numero: data.numero,
-        habilidades: data.habilidades,
-        imagenUrl: `data:image/png;base64,${data.imagen}`
-      });
+      router.reload();
     })
     .catch(error => {
       console.error("Error al guardar el perfil:", error);
@@ -135,10 +122,11 @@ const Perfil = () => {
     if (file) {
         const reader = new FileReader();
         reader.onload = () => {
-            const base64String = reader.result.split(',')[1]; // Eliminar el prefijo data:image/png;base64,
+            const base64String = reader.result.split(',')[1];
             setFormPerfil({
                 ...formPerfil,
-                imagen: base64String
+                imagen: base64String,
+                imagenUrl: reader.result
             });
         };
         reader.readAsDataURL(file);
@@ -170,7 +158,7 @@ const Perfil = () => {
             </Button>
           </>
         ) : (
-          <form className={styles.editForm}>
+          <form className={styles.formSection}>
             <TextField
               label="Nombre"
               name="nombre"
@@ -239,24 +227,32 @@ const Perfil = () => {
               margin="normal"
               required
             />
-            <Button
-              variant="contained"
-              component="label"
-              fullWidth
-              className={styles.uploadButton}
-            >
-              Subir Imagen
-              <input type="file" hidden onChange={handleImageChange} />
-            </Button>
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={handleGuardarPerfil}
-              fullWidth
-              className={styles.fullWidthButton}
-            >
-              Guardar Perfil
-            </Button>
+            <div className={styles.buttonGroup}>
+              <Button
+                variant="contained"
+                component="label"
+                className={styles.uploadButton}
+              >
+                Subir Imagen
+                <input type="file" hidden onChange={handleImageChange} />
+              </Button>
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={handleGuardarPerfil}
+                className={styles.saveButton}
+              >
+                Guardar Perfil
+              </Button>
+              <Button
+                variant="contained"
+                color="secondary"
+                onClick={() => setEditMode(false)}
+                className={styles.regresarButton}
+              >
+                Regresar
+              </Button>
+            </div>
           </form>
         )}
       </Box>

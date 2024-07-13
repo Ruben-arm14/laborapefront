@@ -5,12 +5,12 @@ import "react-datepicker/dist/react-datepicker.css";
 import LogoBar from "@/components/layout/LogoBar";
 import { AppContext } from "@/context/AppContext";
 import styles from '@/styles/global/Formulario.module.css';
-import Snackbar from '@mui/material/Snackbar';
-import MuiAlert from '@mui/material/Alert';
-
-const Alert = React.forwardRef(function Alert(props, ref) {
-  return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
-});
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogTitle from '@mui/material/DialogTitle';
+import Button from '@mui/material/Button';
 
 const Formulario = () => {
   const router = useRouter();
@@ -230,16 +230,42 @@ const Formulario = () => {
           {error && <p className={styles.error}>{error}</p>}
         </form>
       </div>
-      <Snackbar open={success} autoHideDuration={6000} onClose={() => setSuccess(false)}>
-        <Alert onClose={() => setSuccess(false)} severity="success">
-          La actividad se ha enviado correctamente y está en revisión.
-        </Alert>
-      </Snackbar>
-      <Snackbar open={!!error} autoHideDuration={6000} onClose={() => setError(null)}>
-        <Alert onClose={() => setError(null)} severity="error">
-          {error}
-        </Alert>
-      </Snackbar>
+      <Dialog
+        open={success}
+        onClose={() => setSuccess(false)}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title">Actividad Enviada</DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+            La actividad se ha enviado correctamente y está en revisión. Serás redirigido a la página de Mis Trabajos.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setSuccess(false)} color="primary">
+            Cerrar
+          </Button>
+        </DialogActions>
+      </Dialog>
+      <Dialog
+        open={!!error}
+        onClose={() => setError(null)}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title">Error</DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+            {error}
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setError(null)} color="primary">
+            Cerrar
+          </Button>
+        </DialogActions>
+      </Dialog>
     </div>
   );
 };
