@@ -23,10 +23,17 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  flex-direction: column; /* Changed to column */
 }
 
 .logo {
-  width: 50%;
+  width: 60%;
+}
+
+.slogan {
+  font-size: 20px; /* Adjust the font size as needed */
+  color: black; /* Matching the primary color theme */
+  margin-top: 20px; /* Adjust the spacing as needed */
 }
 
 .title {

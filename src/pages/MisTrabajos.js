@@ -20,7 +20,7 @@ const MisTrabajos = () => {
   const [openRateDialog, setOpenRateDialog] = useState(false);
   const [openRateSnackbar, setOpenRateSnackbar] = useState(false);
   const [page, setPage] = useState(1);
-  const [estadoFiltro, setEstadoFiltro] = useState('EN_REVISION'); // Estado por defecto
+  const [estadoFiltro, setEstadoFiltro] = useState(''); // Estado inicial vacío
   const [rating, setRating] = useState(0);
   const [comment, setComment] = useState('');
   const itemsPerPage = 4;
@@ -47,12 +47,18 @@ const MisTrabajos = () => {
         }
         const cliente = await responseCliente.json();
 
-        const response = await fetch(`http://localhost:8080/trabajos/estado/${estadoFiltro}?clienteId=${cliente.idcliente}`);
+        const response = await fetch(`http://localhost:8080/trabajos/cliente/${cliente.idcliente}`);
         if (!response.ok) {
           throw new Error("Error HTTP! status: " + response.status);
         }
         const data = await response.json();
         setTrabajos(data);
+
+        // Ajustar el estado inicial según el primer estado disponible
+        if (data.length > 0) {
+          const uniqueEstados = [...new Set(data.map(trabajo => trabajo.estado))];
+          setEstadoFiltro(uniqueEstados[0]);
+        }
       } catch (err) {
         setError(err.message);
       }
@@ -61,7 +67,7 @@ const MisTrabajos = () => {
     if (user) {
       fetchTrabajos();
     }
-  }, [user, estadoFiltro]);
+  }, [user]);
 
   const handleEdit = (trabajo) => {
     setTrabajoParaEditar(trabajo);
@@ -228,57 +234,62 @@ const MisTrabajos = () => {
     setOpenSnackbar(false);
   };
 
-  const paginatedTrabajos = trabajos.slice((page - 1) * itemsPerPage, page * itemsPerPage);
+  const filteredTrabajos = trabajos.filter(trabajo => trabajo.estado === estadoFiltro);
+  const uniqueEstados = [...new Set(trabajos.map(trabajo => trabajo.estado))];
+  const paginatedTrabajos = filteredTrabajos.slice((page - 1) * itemsPerPage, page * itemsPerPage);
 
   return (
     <>
       <LogoBar />
       <div className={styles.container}>
         <h1 className={styles.title}>Mis Trabajos</h1>
-        <Tabs
-          value={estadoFiltro}
-          onChange={handleEstadoChange}
-          indicatorColor="primary"
-          textColor="primary"
-          centered
-        >
-          <Tab label="EN REVISIÓN" value="EN_REVISION" />
-          <Tab label="PUBLICADO" value="PUBLICADO" />
-          <Tab label="RECHAZADO" value="RECHAZADO" />
-          <Tab label="ACEPTADO" value="ACEPTADO" />
-          <Tab label="EN PROCESO" value="EN_PROCESO" />
-          <Tab label="FINALIZADO" value="FINALIZADO" />
-          <Tab label="CALIFICADO" value="CALIFICADO" />
-        </Tabs>
-        <Box className={styles.trabajosContainer}>
-          {error && <Alert severity="error">{error}</Alert>}
-          {trabajos.length === 0 && !error && (
-            <Alert severity="info" className={styles.noTrabajosMessage}>
-              Por el momento no tienes trabajos con ese estado.
-            </Alert>
-          )}
-          <Grid container spacing={2} justifyContent="center">
-            {paginatedTrabajos.map((trabajo) => (
-              <Grid item key={trabajo.idtrabajo} className={styles.trabajoItem}>
-                <MisTrabajosCard
-                  key={trabajo.idtrabajo}
-                  trabajo={trabajo}
-                  onEdit={handleEdit}
-                  onDelete={handleDelete}
-                  onContact={() => handleContact(trabajo.idtrabajo)}
-                  onFinalize={() => handleFinalize(trabajo)}
-                  onRate={() => handleRate(trabajo)}
-                />
-              </Grid>
-            ))}
-          </Grid>
-        </Box>
-        <Pagination
-          count={Math.ceil(trabajos.length / itemsPerPage)}
-          page={page}
-          onChange={(event, value) => setPage(value)}
-          className={styles.pagination}
-        />
+        {uniqueEstados.length === 0 ? (
+          <Alert severity="info">Por el momento no tienes trabajos.</Alert>
+        ) : (
+          <>
+            <Tabs
+              value={estadoFiltro}
+              onChange={handleEstadoChange}
+              indicatorColor="primary"
+              textColor="primary"
+              centered
+            >
+              {uniqueEstados.map((estado, index) => (
+                <Tab key={index} label={estado.replace('_', ' ')} value={estado} />
+              ))}
+            </Tabs>
+            <Box className={styles.trabajosContainer}>
+              {error && <Alert severity="error">{error}</Alert>}
+              {filteredTrabajos.length === 0 && !error ? (
+                <Alert severity="info" className={styles.noTrabajosMessage}>
+                  Por el momento no tienes trabajos con ese estado.
+                </Alert>
+              ) : (
+                <Grid container spacing={2} justifyContent="center">
+                  {paginatedTrabajos.map((trabajo) => (
+                    <Grid item key={trabajo.idtrabajo} className={styles.trabajoItem}>
+                      <MisTrabajosCard
+                        key={trabajo.idtrabajo}
+                        trabajo={trabajo}
+                        onEdit={handleEdit}
+                        onDelete={handleDelete}
+                        onContact={() => handleContact(trabajo.idtrabajo)}
+                        onFinalize={() => handleFinalize(trabajo)}
+                        onRate={() => handleRate(trabajo)}
+                      />
+                    </Grid>
+                  ))}
+                </Grid>
+              )}
+            </Box>
+            <Pagination
+              count={Math.ceil(filteredTrabajos.length / itemsPerPage)}
+              page={page}
+              onChange={(event, value) => setPage(value)}
+              className={styles.pagination}
+            />
+          </>
+        )}
         {trabajoParaEditar && (
           <EditarTrabajoModal
             trabajo={trabajoParaEditar}

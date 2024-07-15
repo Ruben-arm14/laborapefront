@@ -201,7 +201,7 @@ const Propuestas = () => {
             <>
               <div className={styles.clienteImageWrapper}>
                 <img
-                  src={`data:image/jpeg;base64,${clienteInfo.imagen}`}
+                  src={clienteInfo.imagen ? `data:image/jpeg;base64,${clienteInfo.imagen}` : '/path/to/default-image.jpg'}
                   alt={clienteInfo.nombre}
                   className={styles.clienteImage}
                 />

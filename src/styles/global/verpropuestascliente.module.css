@@ -18,17 +18,32 @@
   color: #333;
 }
 
+.filterContainer {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.tabs {
+  border-bottom: 1px solid #ddd;
+}
+
+.tab {
+  font-size: 16px;
+  font-weight: 600;
+}
+
 .propuestasWrapper {
   max-width: 1200px;
   margin: 0 auto;
   text-align: center;
 }
 
-.propuestaItem {
+.propuestaCard {
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin: 20px 0; /* Ajustar este margen superior para mover la tarjeta más abajo */
+  margin: 20px 0;
   padding: 20px;
   border: 1px solid #ddd;
   border-radius: 12px;
@@ -37,19 +52,15 @@
   transition: transform 0.3s, box-shadow 0.3s;
 }
 
-.propuestaItem:hover {
+.propuestaCard:hover {
   transform: translateY(-5px);
   box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
 }
 
-.freelancerInfo {
-  display: flex;
-  align-items: center;
+.cardHeader {
+  width: 100%;
+  text-align: center;
   margin-bottom: 20px;
-}
-
-.freelancerImageWrapper {
-  margin-right: 20px;
 }
 
 .freelancerImage {
@@ -59,24 +70,28 @@
   object-fit: cover;
 }
 
-.freelancerDetails {
+.cardBody {
   text-align: left;
+  width: 100%;
 }
 
-.trabajoDetails {
+.cardFooter {
   text-align: left;
-  margin-bottom: 20px;
-}
-
-.buttonsContainer {
+  width: 100%;
+  margin-top: 20px;
   display: flex;
-  gap: 10px;
+  justify-content: space-between;
 }
 
-.buttonsContainer Button {
+.cardFooter Button {
   margin: 5px;
 }
 
-.freelancerDetails p, .trabajoDetails p {
-  margin: 5px 0;
+.centerText {
+  text-align: center;
+}
+
+.inlineText {
+  display: inline-block;
+  margin-right: 10px;
 }

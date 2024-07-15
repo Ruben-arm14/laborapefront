@@ -40,17 +40,16 @@ const LoginForm = () => {
           sessionStorage.setItem('clienteId', userData.idcliente);
           router.push('/publicacion');
         } else if (userData.usuario.rol === 'FREELANCER') {
-    const freelancerResponse = await fetch(`http://localhost:8080/usuarios/perfilfreelancer/${userData.usuario.idusuario}`);
-    if (freelancerResponse.ok) {
-        const freelancerData = await freelancerResponse.json();
-        setFreelancerId(freelancerData.idfreelancer);
-        sessionStorage.setItem('freelancerId', freelancerData.idfreelancer);
-        router.push('/trabajosFreelancer');
-    } else {
-        setError("Error al obtener datos del freelancer.");
-    }
-}
- else if (userData.usuario.rol === 'ADMIN') {
+          const freelancerResponse = await fetch(`http://localhost:8080/usuarios/perfilfreelancer/${userData.usuario.idusuario}`);
+          if (freelancerResponse.ok) {
+            const freelancerData = await freelancerResponse.json();
+            setFreelancerId(freelancerData.idfreelancer);
+            sessionStorage.setItem('freelancerId', freelancerData.idfreelancer);
+            router.push('/trabajosFreelancer');
+          } else {
+            setError("Error al obtener datos del freelancer.");
+          }
+        } else if (userData.usuario.rol === 'ADMIN') {
           router.push('/trabajosadmin');
         }
       } else {
@@ -69,10 +68,11 @@ const LoginForm = () => {
     <div className={styles.container}>
       <div className={styles.left_side}>
         <img src="/imagenes/logolaborape.png" alt="LaboraPE Logo" className={styles.logo} />
+        <p className={styles.slogan}>Encontrar chamba nunca fue tan fácil</p>
       </div>
       <div className={styles.right_side}>
         <form onSubmit={handleSubmit} className={styles.form}>
-        <h2 className={styles.title}>Bienvenido a LaboraPE</h2>
+          <h2 className={styles.title}>Bienvenido a LaboraPE</h2>
           <div className={styles.form_group}>
             <label className={styles.sub_title} htmlFor="correo">
               Email

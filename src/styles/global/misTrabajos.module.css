@@ -19,19 +19,19 @@
 .trabajosContainer {
   padding: 20px;
   display: flex;
-  flex-wrap: nowrap;  /* Ajusta para no envolver elementos */
-  overflow-x: auto;  /* Permite el desplazamiento horizontal */
+  flex-wrap: nowrap;
+  overflow-x: auto;
   align-items: center;
-  margin-bottom: 10px; 
+  margin-bottom: 10px;
 }
 
 .trabajoItem {
-  min-width: 300px; /* Ajusta según sea necesario */
-  margin: 0 10px; /* Espaciado entre elementos */
+  min-width: 300px;
+  margin: 0 10px;
 }
 
 .pagination {
-  margin-top: 30px; 
+  margin-top: 30px;
   display: flex;
   justify-content: center;
 }
@@ -45,7 +45,8 @@
 
 .noTrabajosMessage {
   margin-top: 100px;
-  margin-left: 800px;
+  margin-left: auto;
+  margin-right: auto;
   padding: 20px;
   font-size: 16px;
   color: #555;
@@ -70,8 +71,10 @@
 }
 
 .freelancerImage {
-  max-width: 100%;
-  height: auto;
+  width: 150px;
+  height: 150px;
   border-radius: 50%;
   object-fit: cover;
+  display: block;
+  margin: 0 auto;
 }

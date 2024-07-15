@@ -11,8 +11,8 @@
 
 .title {
   font-size: 2.5rem;
-  padding-top: 70px;
-  margin-bottom: 30px;
+  padding-top: 150px;
+  margin-bottom: 50px;
   color: #333; /* Color de texto oscuro para el título */
 }
 
@@ -92,4 +92,17 @@
   border-radius: 5px;
   font-size: 16px;
   text-align: center;
+}
+
+.clienteImageWrapper {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.clienteImage {
+  width: 100px; /* Tamaño estándar para la imagen del cliente */
+  height: 100px;
+  border-radius: 50%; /* Hacer la imagen circular */
+  object-fit: cover; /* Asegurar que la imagen mantenga sus proporciones */
+  margin: 0 auto; /* Centrar la imagen horizontalmente */
 }

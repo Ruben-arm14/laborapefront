@@ -54,6 +54,7 @@ const ResetPasswordForm = () => {
       <ToastContainer />
       <div className={styles.left_side}>
         <img src="/imagenes/logolaborape.png" alt="LaboraPE Logo" className={styles.logo} />
+        <p className={styles.slogan}>Encontrar chamba nunca fue tan fácil</p>
       </div>
       <div className={styles.right_side}>
         <form onSubmit={handleSubmit} className={styles.form}>

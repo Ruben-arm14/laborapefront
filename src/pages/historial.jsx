@@ -4,6 +4,7 @@ import { Box, Grid, Tabs, Tab, Dialog, DialogActions, DialogContent, DialogConte
 import { AppContext } from '@/context/AppContext';
 import styles from '@/styles/global/historial.module.css';
 import Rating from '@mui/material/Rating';
+import defaultImage from '@/Imagenes/perfil.png'; // Ruta a la imagen de perfil predeterminada en el directorio public
 
 const Historial = () => {
   const { user, freelancerId } = useContext(AppContext);
@@ -64,7 +65,6 @@ const Historial = () => {
       const response = await fetch(`http://localhost:8080/calificaciones/trabajo/${trabajoId}`);
       if (!response.ok) {
         if (response.status === 404) {
-          // No hay calificaciones
           setCalificacionInfo(null);
         } else {
           throw new Error('Failed to fetch calificación details');
@@ -72,7 +72,7 @@ const Historial = () => {
       } else {
         const calificacionData = await response.json();
         if (calificacionData.length > 0) {
-          setCalificacionInfo(calificacionData[0]); // Tomar la primera calificación de la lista
+          setCalificacionInfo(calificacionData[0]);
         } else {
           setCalificacionInfo(null);
         }
@@ -112,15 +112,11 @@ const Historial = () => {
         <Grid container spacing={2} direction="column">
           {filteredHistorial.map((historialItem) => (
             <Grid item key={historialItem.id} className={styles.historialItem}>
-              {historialItem.trabajo.imagen ? (
-                <img
-                  src={`data:image/jpeg;base64,${historialItem.trabajo.imagen}`}
-                  alt={historialItem.trabajo.titulo}
-                  className={styles.trabajoImage}
-                />
-              ) : (
-                <p>Imagen no disponible.</p>
-              )}
+              <img
+                src={historialItem.trabajo.imagen ? `data:image/jpeg;base64,${historialItem.trabajo.imagen}` : defaultImage}
+                alt={historialItem.trabajo.titulo}
+                className={styles.trabajoImage}
+              />
               <div className={styles.historialDetails}>
                 <h2>{historialItem.trabajo.titulo}</h2>
                 <p>{historialItem.trabajo.descripcion}</p>
@@ -158,7 +154,7 @@ const Historial = () => {
             <>
               <div className={styles.clienteImageWrapper}>
                 <img
-                  src={`data:image/jpeg;base64,${clienteInfo.imagen}`}
+                  src={clienteInfo.imagen ? `data:image/jpeg;base64,${clienteInfo.imagen}` : defaultImage}
                   alt={clienteInfo.nombre}
                   className={styles.clienteImage}
                 />
