@@ -1,55 +1,86 @@
 .container {
-    padding: 2rem;
-  }
-  
-  .title {
-    text-align: center;
-    margin-bottom: 2rem;
-  }
-  
-  .trabajosWrapper {
-    display: flex;
-    justify-content: center;
-    flex-wrap: wrap;
-  }
-  
-  .trabajoItem {
-    margin: 1rem;
-    padding: 1rem;
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    text-align: center;
-    max-width: 300px; /* Ajustar el tamaño máximo del contenedor */
-  }
-  
-  .trabajoImage {
-    max-width: 100%;
-    height: auto;
-    border-radius: 8px;
-    margin-bottom: 1rem;
-    width: 150px; /* Ajustar el tamaño de la imagen */
-    height: auto;
-  }
-  
-  .trabajoTitle {
-    font-size: 1.5rem;
-    margin-bottom: 0.5rem;
-  }
-  
-  .trabajoDescription {
-    margin-bottom: 1rem;
-  }
-  
-  .trabajoInfo {
-    font-size: 1rem;
-    margin-bottom: 0.5rem;
-  }
-  
-  .approveButton {
-    margin-right: 0.5rem;
-  }
-  
-  .disapproveButton {
-    margin-left: 0.5rem;
-  }
-  
+  padding: 2rem;
+}
+
+.title {
+  text-align: center;
+  margin-bottom: 2rem;
+  font-size: 2rem;
+  color: #333;
+}
+
+.filtroContainer {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 1rem;
+}
+
+.filtroButton {
+  margin: 0 0.5rem;
+  padding: 0.5rem 1rem;
+  background-color: #f8f9fa;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.filtroButton:hover {
+  background-color: #e2e6ea;
+  transform: scale(1.05);
+}
+
+.filtroButton.active {
+  background-color: #007bff;
+  color: #fff;
+}
+
+.trabajosWrapper {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.trabajoItem {
+  margin: 1rem;
+  padding: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  text-align: center;
+  max-width: 300px; 
+  background-color: #f9f9f9;
+  transition: transform 0.2s;
+}
+
+.trabajoItem:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.trabajoImage {
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  width: 150px;
+  height: 150px; /* Asegurar un tamaño uniforme */
+  object-fit: cover; /* Mantener la proporción de la imagen */
+}
+
+.trabajoTitle {
+  font-size: 1.5rem;
+  margin-bottom: 0.5rem;
+  color: #333;
+}
+
+.trabajoDescription, .trabajoInfo {
+  font-size: 1rem;
+  margin-bottom: 0.5rem;
+  color: #666;
+}
+
+.approveButton, .disapproveButton {
+  margin: 0.5rem;
+  padding: 0.5rem 1rem;
+  font-size: 0.9rem;
+}

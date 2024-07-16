@@ -1,10 +1,23 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { Box, Grid, Alert, Tabs, Tab, Snackbar, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Button, TextField, Pagination } from '@mui/material';
+import {
+  Box,
+  Grid,
+  Alert,
+  Snackbar,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+  Button,
+  TextField,
+  Pagination,
+  Rating,
+} from '@mui/material';
 import EditarTrabajoModal from '@/components/trabajos/EditarTrabajoModal';
 import MisTrabajosCard from '@/components/trabajos/MisTrabajosCard';
 import LogoBar from '@/components/layout/LogoBar';
 import { AppContext } from '@/context/AppContext';
-import Rating from '@mui/material/Rating';
 import styles from '@/styles/global/misTrabajos.module.css';
 
 const MisTrabajos = () => {
@@ -20,7 +33,7 @@ const MisTrabajos = () => {
   const [openRateDialog, setOpenRateDialog] = useState(false);
   const [openRateSnackbar, setOpenRateSnackbar] = useState(false);
   const [page, setPage] = useState(1);
-  const [estadoFiltro, setEstadoFiltro] = useState(''); // Estado inicial vacío
+  const [estadoFiltro, setEstadoFiltro] = useState('');
   const [rating, setRating] = useState(0);
   const [comment, setComment] = useState('');
   const itemsPerPage = 4;
@@ -54,7 +67,6 @@ const MisTrabajos = () => {
         const data = await response.json();
         setTrabajos(data);
 
-        // Ajustar el estado inicial según el primer estado disponible
         if (data.length > 0) {
           const uniqueEstados = [...new Set(data.map(trabajo => trabajo.estado))];
           setEstadoFiltro(uniqueEstados[0]);
@@ -78,9 +90,9 @@ const MisTrabajos = () => {
       const response = await fetch(`http://localhost:8080/trabajos/${idtrabajo}/actualizar-estado`, {
         method: 'PUT',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ estado })
+        body: JSON.stringify({ estado }),
       });
       if (!response.ok) {
         throw new Error("Error HTTP! status: " + response.status);
@@ -96,7 +108,7 @@ const MisTrabajos = () => {
   const handleDelete = async (idtrabajo) => {
     try {
       const response = await fetch(`http://localhost:8080/trabajos/${idtrabajo}`, {
-        method: 'DELETE'
+        method: 'DELETE',
       });
       if (!response.ok) {
         throw new Error("Error HTTP! status: " + response.status);
@@ -110,7 +122,7 @@ const MisTrabajos = () => {
   const finalizarTrabajoYPostulacion = async (idtrabajo) => {
     try {
       const response = await fetch(`http://localhost:8080/trabajos/${idtrabajo}/finalizar`, {
-        method: 'PUT'
+        method: 'PUT',
       });
       if (!response.ok) {
         throw new Error("Error HTTP! status: " + response.status);
@@ -124,18 +136,14 @@ const MisTrabajos = () => {
   };
 
   const handleContact = async (idtrabajo) => {
-    console.log("handleContact llamado con idtrabajo:", idtrabajo);
     try {
-      // Actualizar el estado del trabajo a "EN_PROCESO"
       await actualizarEstadoTrabajo(idtrabajo, 'EN_PROCESO');
 
-      // Obtener la información del freelancer
       const response = await fetch(`http://localhost:8080/freelancers/trabajo/${idtrabajo}/detalle`);
       if (!response.ok) {
         throw new Error("Error HTTP! status: " + response.status);
       }
       const freelancerData = await response.json();
-      console.log("Datos del freelancer:", freelancerData);
       setFreelancerInfo(freelancerData);
       setOpenFreelancerModal(true);
     } catch (err) {
@@ -187,15 +195,15 @@ const MisTrabajos = () => {
       const response = await fetch('http://localhost:8080/calificaciones', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
         },
         body: JSON.stringify({
           idtrabajo: trabajoParaContacto.idtrabajo,
           idusuario: user.idusuario,
           idfreelancer: freelancerInfo.idfreelancer,
           calificacion: rating,
-          comentario: comment
-        })
+          comentario: comment,
+        }),
       });
 
       if (!response.ok) {
@@ -226,8 +234,8 @@ const MisTrabajos = () => {
     ));
   };
 
-  const handleEstadoChange = (event, newValue) => {
-    setEstadoFiltro(newValue);
+  const handleEstadoChange = (estado) => {
+    setEstadoFiltro(estado);
   };
 
   const handleCloseSnackbar = () => {
@@ -247,17 +255,18 @@ const MisTrabajos = () => {
           <Alert severity="info">Por el momento no tienes trabajos.</Alert>
         ) : (
           <>
-            <Tabs
-              value={estadoFiltro}
-              onChange={handleEstadoChange}
-              indicatorColor="primary"
-              textColor="primary"
-              centered
-            >
+            <Box className={styles.tabsContainer}>
               {uniqueEstados.map((estado, index) => (
-                <Tab key={index} label={estado.replace('_', ' ')} value={estado} />
+                <Button
+                  key={index}
+                  variant={estadoFiltro === estado ? "contained" : "outlined"}
+                  onClick={() => handleEstadoChange(estado)}
+                  className={estadoFiltro === estado ? styles.activeTab : ''}
+                >
+                  {estado.replace('_', ' ')}
+                </Button>
               ))}
-            </Tabs>
+            </Box>
             <Box className={styles.trabajosContainer}>
               {error && <Alert severity="error">{error}</Alert>}
               {filteredTrabajos.length === 0 && !error ? (

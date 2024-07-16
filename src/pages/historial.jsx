@@ -4,7 +4,7 @@ import { Box, Grid, Tabs, Tab, Dialog, DialogActions, DialogContent, DialogConte
 import { AppContext } from '@/context/AppContext';
 import styles from '@/styles/global/historial.module.css';
 import Rating from '@mui/material/Rating';
-import defaultImage from '@/Imagenes/perfil.png'; // Ruta a la imagen de perfil predeterminada en el directorio public
+import defaultImage from '@/Imagenes/perfil.png';
 
 const Historial = () => {
   const { user, freelancerId } = useContext(AppContext);
@@ -104,45 +104,46 @@ const Historial = () => {
       <LogoBarFreelance />
       <h1 className={styles.title}>Historial</h1>
       <Tabs value={filtro} onChange={handleFiltroChange} className={styles.tabs}>
-        <Tab label={`Todos (${getCountByState('EN_PROCESO') + getCountByState('TERMINADO')})`} value="todos" />
         <Tab label={`En Proceso (${getCountByState('EN_PROCESO')})`} value="EN_PROCESO" />
         <Tab label={`Terminado (${getCountByState('TERMINADO')})`} value="TERMINADO" />
       </Tabs>
       <Box className={styles.historialContainer}>
-        <Grid container spacing={2} direction="column">
+        <Grid container spacing={3} justifyContent="center">
           {filteredHistorial.map((historialItem) => (
-            <Grid item key={historialItem.id} className={styles.historialItem}>
-              <img
-                src={historialItem.trabajo.imagen ? `data:image/jpeg;base64,${historialItem.trabajo.imagen}` : defaultImage}
-                alt={historialItem.trabajo.titulo}
-                className={styles.trabajoImage}
-              />
-              <div className={styles.historialDetails}>
-                <h2>{historialItem.trabajo.titulo}</h2>
-                <p>{historialItem.trabajo.descripcion}</p>
-                <p><strong>Ubicación:</strong> {historialItem.trabajo.ubicacion}</p>
-                <p><strong>Fecha Límite:</strong> {new Date(historialItem.trabajo.fechaLimite).toLocaleDateString()}</p>
-                <p><strong>Presupuesto:</strong> {historialItem.presupuesto}</p>
-                <p><strong>Estado:</strong> {historialItem.estado}</p>
-                {historialItem.estado === 'EN_PROCESO' && (
+            <Grid item key={historialItem.id} xs={12} sm={6} md={4}>
+              <div className={styles.historialItem}>
+                <img
+                  src={historialItem.trabajo.imagen ? `data:image/jpeg;base64,${historialItem.trabajo.imagen}` : defaultImage}
+                  alt={historialItem.trabajo.titulo}
+                  className={styles.trabajoImage}
+                />
+                <div className={styles.historialDetails}>
+                  <h2>{historialItem.trabajo.titulo}</h2>
+                  <p>{historialItem.trabajo.descripcion}</p>
+                  <p><strong>Ubicación:</strong> {historialItem.trabajo.ubicacion}</p>
+                  <p><strong>Fecha Límite:</strong> {new Date(historialItem.trabajo.fechaLimite).toLocaleDateString()}</p>
+                  <p><strong>Presupuesto:</strong> {historialItem.presupuesto}</p>
+                  <p><strong>Estado:</strong> {historialItem.estado}</p>
+                  {historialItem.estado === 'EN_PROCESO' && (
+                    <Button
+                      variant="contained"
+                      color="primary"
+                      onClick={() => handleViewContact(historialItem)}
+                    >
+                      Ver Contacto
+                    </Button>
+                  )}
+                </div>
+                {historialItem.estado === 'TERMINADO' && (
                   <Button
                     variant="contained"
                     color="primary"
-                    onClick={() => handleViewContact(historialItem)}
+                    onClick={() => handleViewCalificacion(historialItem.trabajo.idtrabajo)}
                   >
-                    Ver Contacto
+                    Ver Calificación
                   </Button>
                 )}
               </div>
-              {historialItem.estado === 'TERMINADO' && (
-                <Button
-                  variant="contained"
-                  color="primary"
-                  onClick={() => handleViewCalificacion(historialItem.trabajo.idtrabajo)}
-                >
-                  Ver Calificación
-                </Button>
-              )}
             </Grid>
           ))}
         </Grid>

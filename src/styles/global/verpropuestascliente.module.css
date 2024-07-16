@@ -24,13 +24,24 @@
   margin-bottom: 20px;
 }
 
-.tabs {
-  border-bottom: 1px solid #ddd;
+.filtroButton {
+  margin: 0 0.5rem;
+  padding: 0.5rem 1rem;
+  background-color: #f8f9fa;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
 }
 
-.tab {
-  font-size: 16px;
-  font-weight: 600;
+.filtroButton:hover {
+  background-color: #e2e6ea;
+  transform: scale(1.05);
+}
+
+.filtroButton.active {
+  background-color: #007bff;
+  color: #fff;
 }
 
 .propuestasWrapper {

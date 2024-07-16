@@ -38,7 +38,7 @@ const LoginForm = () => {
         if (userData.usuario.rol === 'CLIENTE') {
           setClienteId(userData.idcliente);
           sessionStorage.setItem('clienteId', userData.idcliente);
-          router.push('/publicacion');
+          router.push('/perfilcliente');
         } else if (userData.usuario.rol === 'FREELANCER') {
           const freelancerResponse = await fetch(`http://localhost:8080/usuarios/perfilfreelancer/${userData.usuario.idusuario}`);
           if (freelancerResponse.ok) {

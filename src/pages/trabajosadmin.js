@@ -1,5 +1,7 @@
 import React, { useEffect, useState, useContext } from 'react';
-import { Box, Grid, Button, Alert } from '@mui/material';
+import { Box, Grid, Button } from '@mui/material';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import LogoBarAdmin from '@/components/layout/LogoBarAdmin';
 import { AppContext } from '@/context/AppContext';
 import styles from '@/styles/global/vertrabajos.module.css';
@@ -7,8 +9,9 @@ import styles from '@/styles/global/vertrabajos.module.css';
 const TrabajosAdmin = () => {
   const { user, setUser } = useContext(AppContext);
   const [trabajos, setTrabajos] = useState([]);
+  const [categorias, setCategorias] = useState([]);
+  const [categoriaSeleccionada, setCategoriaSeleccionada] = useState('');
   const [error, setError] = useState(null);
-  const [alerta, setAlerta] = useState(null);
 
   useEffect(() => {
     const storedUser = sessionStorage.getItem('usuario');
@@ -24,7 +27,7 @@ const TrabajosAdmin = () => {
     if (user && user.rol === 'ADMIN') {
       fetchTrabajosEnRevision();
     } else {
-      setError("");
+      setError("No tienes permisos para acceder a esta sección.");
     }
   }, [user]);
 
@@ -37,6 +40,8 @@ const TrabajosAdmin = () => {
       }
       const data = await response.json();
       setTrabajos(data);
+      const categoriasUnicas = [...new Set(data.map(trabajo => trabajo.categoria))];
+      setCategorias(categoriasUnicas);
     } catch (error) {
       setError(error.message);
     }
@@ -52,7 +57,7 @@ const TrabajosAdmin = () => {
         throw new Error(errorData.error || 'Error al aprobar trabajo');
       }
       const result = await response.json();
-      setAlerta(result.message);
+      toast.success(result.message);
       fetchTrabajosEnRevision();
     } catch (error) {
       setError(error.message);
@@ -69,23 +74,37 @@ const TrabajosAdmin = () => {
         throw new Error(errorData.error || 'Error al desaprobar trabajo');
       }
       const result = await response.json();
-      setAlerta(result.message);
+      toast.error(result.message);
       fetchTrabajosEnRevision();
     } catch (error) {
       setError(error.message);
     }
   };
 
+  const handleCategoriaChange = (categoria) => {
+    setCategoriaSeleccionada(categoria);
+  };
+
   return (
     <>
       <LogoBarAdmin />
       <div className={styles.container}>
-        <h1 className={styles.title}>Trabajos Enviados</h1>
+        <h1 className={styles.title}>Revisión de trabajos</h1>
         {error && <p className={styles.error}>{error}</p>}
-        {alerta && <Alert severity="success">{alerta}</Alert>}
+        <div className={styles.filtroContainer}>
+          {categorias.map((categoria, index) => (
+            <button
+              key={index}
+              className={`${styles.filtroButton} ${categoriaSeleccionada === categoria ? styles.active : ''}`}
+              onClick={() => handleCategoriaChange(categoria)}
+            >
+              {categoria}
+            </button>
+          ))}
+        </div>
         <Box className={styles.trabajosWrapper}>
           <Grid container spacing={2} justifyContent="center">
-            {trabajos.map((trabajo, index) => (
+            {trabajos.filter(trabajo => !categoriaSeleccionada || trabajo.categoria === categoriaSeleccionada).map((trabajo, index) => (
               <Grid item key={index} className={styles.trabajoItem}>
                 <div className={styles.trabajoDetails}>
                   <img src={trabajo.imagenUrl || "https://via.placeholder.com/150"} alt={trabajo.titulo} className={styles.trabajoImage} />
@@ -93,7 +112,8 @@ const TrabajosAdmin = () => {
                   <p className={styles.trabajoDescription}>{trabajo.descripcion}</p>
                   <p className={styles.trabajoInfo}>Ubicación: {trabajo.ubicacion}</p>
                   <p className={styles.trabajoInfo}>Presupuesto: {trabajo.presupuesto}</p>
-                  <p className={styles.trabajoInfo}>Fecha Límite: {trabajo.fechaLimite}</p>
+                  <p className={styles.trabajoInfo}>Categoría: {trabajo.categoria}</p>
+                  <p className={styles.trabajoInfo}>Fecha Límite: {new Date(trabajo.fechaLimite).toLocaleDateString()}</p>
                   <Button
                     variant="contained"
                     color="primary"
@@ -116,6 +136,7 @@ const TrabajosAdmin = () => {
           </Grid>
         </Box>
       </div>
+      <ToastContainer />
     </>
   );
 };

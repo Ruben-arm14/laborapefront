@@ -2,22 +2,26 @@ import React, { useState, useEffect, useContext } from 'react';
 import { Box, Grid, Alert, Pagination, Typography } from '@mui/material';
 import LogoBarFreelance from '@/components/layout/LogoBarFreelance';
 import { AppContext } from '@/context/AppContext';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import styles from '@/styles/global/trabajosFreelancer.module.css';
 import PostularPopup from '@/components/trabajos/PostularPopup';
 
 const TrabajosFreelancer = () => {
   const { user, setUser } = useContext(AppContext);
   const [trabajos, setTrabajos] = useState([]);
+  const [categorias, setCategorias] = useState([]);
+  const [categoriaSeleccionada, setCategoriaSeleccionada] = useState('');
   const [error, setError] = useState(null);
   const [open, setOpen] = useState(false);
   const [selectedTrabajo, setSelectedTrabajo] = useState(null);
   const [page, setPage] = useState(1);
-  const [rowsPerPage] = useState(5); // Cambié el valor a 5
+  const [rowsPerPage] = useState(5);
 
   useEffect(() => {
     const fetchTrabajos = async () => {
       try {
-        const response = await fetch('http://localhost:8080/trabajos/estado/PUBLICADO'); // Solo trabajos publicados
+        const response = await fetch('http://localhost:8080/trabajos/estado/PUBLICADO');
         if (!response.ok) {
           throw new Error("Error HTTP! status: " + response.status);
         }
@@ -50,6 +54,8 @@ const TrabajosFreelancer = () => {
       console.log("Postulaciones obtenidas:", postulacionesData);
       const trabajosFiltrados = trabajosData.filter(trabajo => !postulacionesData.includes(trabajo.idtrabajo));
       setTrabajos(trabajosFiltrados);
+      const categoriasUnicas = [...new Set(trabajosFiltrados.map(trabajo => trabajo.categoria))];
+      setCategorias(categoriasUnicas);
     };
 
     if (user && user.idfreelancer) {
@@ -79,10 +85,9 @@ const TrabajosFreelancer = () => {
     };
 
     fetchFreelancerProfile();
-  }, [user && user.idusuario, setUser]); // Asegurarse de que el user.idusuario sea evaluado correctamente
+  }, [user && user.idusuario, setUser]);
 
   const handleOpen = (trabajo) => {
-    // Verificar si el freelancer tiene habilidades
     if (!user.habilidades || user.habilidades.trim() === "") {
       alert("Antes de postular debes llenar tus HABILIDADES en la sección de perfil");
       return;
@@ -103,21 +108,37 @@ const TrabajosFreelancer = () => {
     const updatedTrabajos = trabajos.filter(trabajo => trabajo.idtrabajo !== selectedTrabajo.idtrabajo);
     setTrabajos(updatedTrabajos);
     handleClose();
+    toast.success("Tu postulación fue enviada correctamente!");
   };
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
   };
 
+  const handleCategoriaChange = (categoria) => {
+    setCategoriaSeleccionada(categoria);
+  };
+
   const indexOfLastPost = page * rowsPerPage;
   const indexOfFirstPost = indexOfLastPost - rowsPerPage;
-  const currentTrabajos = trabajos.slice(indexOfFirstPost, indexOfLastPost);
+  const currentTrabajos = trabajos.filter(trabajo => !categoriaSeleccionada || trabajo.categoria === categoriaSeleccionada).slice(indexOfFirstPost, indexOfLastPost);
 
   return (
     <>
       <LogoBarFreelance />
       <div className={styles.containerTrabajosFreelancer}>
         <h1 className={styles.titleFreelancer}>Trabajos Disponibles</h1>
+        <div className={styles.filtroContainer}>
+          {categorias.map((categoria, index) => (
+            <button
+              key={index}
+              className={`${styles.filtroButton} ${categoriaSeleccionada === categoria ? styles.active : ''}`}
+              onClick={() => handleCategoriaChange(categoria)}
+            >
+              {categoria}
+            </button>
+          ))}
+        </div>
         <Box className={styles.trabajosContainerFreelancer}>
           {error && <Alert severity="error">{error}</Alert>}
           <Grid container spacing={4} justifyContent="center">
@@ -131,6 +152,7 @@ const TrabajosFreelancer = () => {
                     <Typography variant="body2" className={styles.trabajoPresupuestoFreelancer}>Presupuesto: {trabajo.presupuesto}</Typography>
                     <Typography variant="body2" className={styles.trabajoClienteFreelancer}>Cliente: {trabajo.nombreCliente || 'Desconocido'}</Typography>
                     <Typography variant="body2" className={styles.trabajoUbicacionFreelancer}>Ubicación: {trabajo.ubicacion}</Typography>
+                    <Typography variant="body2" className={styles.trabajoCategoriaFreelancer}>Categoria: {trabajo.categoria}</Typography>
                     <Typography variant="body2" className={styles.trabajoFechaLimiteFreelancer}>Fecha Límite: {new Date(trabajo.fechaLimite).toLocaleString()}</Typography>
                     <button className={styles.postularButtonFreelancer} onClick={() => handleOpen(trabajo)}>POSTULAR</button>
                   </div>
@@ -150,6 +172,7 @@ const TrabajosFreelancer = () => {
           className={styles.pagination}
         />
       </div>
+      <ToastContainer />
       {user && selectedTrabajo && (
         <PostularPopup
           open={open}

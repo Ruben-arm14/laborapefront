@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useContext } from 'react';
-import { Box, Grid, Container, Typography, Button, CircularProgress, Alert, Tabs, Tab } from '@mui/material';
+import { Box, Grid, Container, Typography, Button, CircularProgress, Alert, Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
 import LogoBar from '@/components/layout/LogoBar';
 import styles from '@/styles/global/verpropuestascliente.module.css';
 import { AppContext } from '@/context/AppContext';
@@ -11,6 +11,10 @@ const VerPropuestas = () => {
   const { user } = useContext(AppContext);
   const [filter, setFilter] = useState('');
   const [categories, setCategories] = useState([]);
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [confirmMessage, setConfirmMessage] = useState('');
+  const [selectedPropuestaId, setSelectedPropuestaId] = useState(null);
+  const [actionType, setActionType] = useState('');
 
   useEffect(() => {
     if (user && user.idusuario) {
@@ -24,9 +28,10 @@ const VerPropuestas = () => {
           }
           const data = await response.json();
           console.log("Data received from backend:", data);
-          setPropuestas(data);
+          const filteredData = data.filter(propuesta => propuesta.estado === 'PENDIENTE');
+          setPropuestas(filteredData);
 
-          const uniqueCategories = [...new Set(data.map(propuesta => propuesta.trabajo.categoria))];
+          const uniqueCategories = [...new Set(filteredData.map(propuesta => propuesta.trabajo.categoria))];
           setCategories(uniqueCategories);
         } catch (error) {
           console.error('Error fetching postulaciones:', error);
@@ -39,43 +44,9 @@ const VerPropuestas = () => {
     }
   }, [user]);
 
-  const handleAceptar = async (propuestaId) => {
-    const confirm = window.confirm("¿Seguro que desea aceptar la postulación? Se rechazarán las demás postulaciones en caso tengas activo.");
-    if (confirm) {
-      try {
-        const response = await fetch(`http://localhost:8080/postulaciones/${propuestaId}/aceptar`, {
-          method: 'POST',
-        });
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        const clienteId = sessionStorage.getItem('clienteId');
-        const fetchPropuestas = async () => {
-          try {
-            const response = await fetch(`http://localhost:8080/postulaciones/cliente/${clienteId}`);
-            if (!response.ok) {
-              throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            const data = await response.json();
-            setPropuestas(data.filter(propuesta => propuesta.estado === 'PENDIENTE'));
-            const uniqueCategories = [...new Set(data.map(propuesta => propuesta.trabajo.categoria))];
-            setCategories(uniqueCategories);
-          } catch (error) {
-            console.error('Error fetching postulaciones:', error);
-            setError(error);
-          }
-        };
-        fetchPropuestas();
-      } catch (error) {
-        console.error('Error accepting postulacion:', error);
-        setError(error);
-      }
-    }
-  };
-
-  const handleRechazar = async (propuestaId) => {
+  const handleAceptar = async () => {
     try {
-      const response = await fetch(`http://localhost:8080/postulaciones/${propuestaId}/rechazar`, {
+      const response = await fetch(`http://localhost:8080/postulaciones/${selectedPropuestaId}/aceptar`, {
         method: 'POST',
       });
       if (!response.ok) {
@@ -89,8 +60,43 @@ const VerPropuestas = () => {
             throw new Error(`HTTP error! status: ${response.status}`);
           }
           const data = await response.json();
-          setPropuestas(data.filter(propuesta => propuesta.estado === 'PENDIENTE'));
-          const uniqueCategories = [...new Set(data.map(propuesta => propuesta.trabajo.categoria))];
+          const filteredData = data.filter(propuesta => propuesta.estado === 'PENDIENTE');
+          setPropuestas(filteredData);
+          const uniqueCategories = [...new Set(filteredData.map(propuesta => propuesta.trabajo.categoria))];
+          setCategories(uniqueCategories);
+        } catch (error) {
+          console.error('Error fetching postulaciones:', error);
+          setError(error);
+        }
+      };
+      fetchPropuestas();
+    } catch (error) {
+      console.error('Error accepting postulacion:', error);
+      setError(error);
+    } finally {
+      setConfirmOpen(false);
+    }
+  };
+
+  const handleRechazar = async () => {
+    try {
+      const response = await fetch(`http://localhost:8080/postulaciones/${selectedPropuestaId}/rechazar`, {
+        method: 'POST',
+      });
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      const clienteId = sessionStorage.getItem('clienteId');
+      const fetchPropuestas = async () => {
+        try {
+          const response = await fetch(`http://localhost:8080/postulaciones/cliente/${clienteId}`);
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+          const data = await response.json();
+          const filteredData = data.filter(propuesta => propuesta.estado === 'PENDIENTE');
+          setPropuestas(filteredData);
+          const uniqueCategories = [...new Set(filteredData.map(propuesta => propuesta.trabajo.categoria))];
           setCategories(uniqueCategories);
         } catch (error) {
           console.error('Error fetching postulaciones:', error);
@@ -101,10 +107,31 @@ const VerPropuestas = () => {
     } catch (error) {
       console.error('Error rejecting postulacion:', error);
       setError(error);
+    } finally {
+      setConfirmOpen(false);
     }
   };
 
-  const handleFilterChange = (event, newValue) => {
+  const openConfirmDialog = (propuestaId, action) => {
+    setSelectedPropuestaId(propuestaId);
+    setActionType(action);
+    setConfirmMessage(
+      action === 'accept' 
+        ? '¿Seguro que desea aceptar la postulación? Se rechazarán las demás postulaciones en caso tengas activo.'
+        : '¿Seguro que desea rechazar la postulación?'
+    );
+    setConfirmOpen(true);
+  };
+
+  const handleConfirm = () => {
+    if (actionType === 'accept') {
+      handleAceptar();
+    } else if (actionType === 'reject') {
+      handleRechazar();
+    }
+  };
+
+  const handleFilterChange = (newValue) => {
     setFilter(newValue);
   };
 
@@ -117,12 +144,15 @@ const VerPropuestas = () => {
       <Container className={styles.pageContainer}>
         <Typography variant="h4" className={styles.subtitle}>Propuestas</Typography>
         <Box className={styles.filterContainer}>
-          <Tabs value={filter} onChange={handleFilterChange} className={styles.tabs}>
-            <Tab label="Todas" value="" />
-            {categories.map((category, index) => (
-              <Tab key={index} label={category} value={category} />
-            ))}
-          </Tabs>
+          {categories.map((category, index) => (
+            <button
+              key={index}
+              className={`${styles.filtroButton} ${filter === category ? styles.active : ''}`}
+              onClick={() => handleFilterChange(category)}
+            >
+              {category}
+            </button>
+          ))}
         </Box>
         <Box className={styles.propuestasWrapper}>
           {propuestas.length === 0 ? (
@@ -130,7 +160,7 @@ const VerPropuestas = () => {
           ) : (
             <Grid container spacing={4}>
               {propuestas
-                .filter(propuesta => propuesta.estado === 'PENDIENTE' && (filter === '' || propuesta.trabajo.categoria === filter))
+                .filter(propuesta => filter === '' || propuesta.trabajo.categoria === filter)
                 .map((propuesta, index) => (
                   <Grid item xs={12} sm={6} md={4} key={index}>
                     <div className={styles.propuestaCard}>
@@ -154,8 +184,8 @@ const VerPropuestas = () => {
                         <Typography variant="body2" className={styles.inlineText}><strong>Presupuesto:</strong> {propuesta.presupuesto}</Typography>
                       </div>
                       <div className={styles.cardFooter}>
-                        <Button variant="contained" color="primary" onClick={() => handleAceptar(propuesta.id)}>Aceptar</Button>
-                        <Button variant="contained" color="secondary" onClick={() => handleRechazar(propuesta.id)}>Rechazar</Button>
+                        <Button variant="contained" color="primary" onClick={() => openConfirmDialog(propuesta.id, 'accept')}>Aceptar</Button>
+                        <Button variant="contained" color="secondary" onClick={() => openConfirmDialog(propuesta.id, 'reject')}>Rechazar</Button>
                       </div>
                     </div>
                   </Grid>
@@ -164,6 +194,20 @@ const VerPropuestas = () => {
           )}
         </Box>
       </Container>
+      <Dialog open={confirmOpen} onClose={() => setConfirmOpen(false)}>
+        <DialogTitle>Confirmación</DialogTitle>
+        <DialogContent>
+          <Typography>{confirmMessage}</Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setConfirmOpen(false)} color="secondary">
+            Cancelar
+          </Button>
+          <Button onClick={handleConfirm} color="primary">
+            Aceptar
+          </Button>
+        </DialogActions>
+      </Dialog>
     </div>
   );
 };

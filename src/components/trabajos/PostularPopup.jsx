@@ -42,7 +42,6 @@ const PostularPopup = ({ open, onClose, trabajo, freelancer, onPostular }) => {
       });
 
       if (response.ok) {
-        toast.success("Solicitud enviada");
         onPostular(); // Call the function to refresh the list of jobs
         onClose();
       } else {
@@ -65,6 +64,8 @@ const PostularPopup = ({ open, onClose, trabajo, freelancer, onPostular }) => {
         <Typography variant="body2" color="textSecondary" gutterBottom>{trabajo?.nombreCliente || 'Desconocido'}</Typography>
         <Typography variant="body1" gutterBottom className={styles.trabajoDescripcion}>{trabajo?.descripcion}</Typography>
         <Typography variant="body2" color="textSecondary" gutterBottom className={styles.trabajoUbicacion}>Ubicación: {trabajo?.ubicacion}</Typography>
+        <Typography variant="body2" color="textSecondary" gutterBottom className={styles.trabajoUbicacion}>Presupuesto: {trabajo?.presupuesto}</Typography>
+        <Typography variant="body2" color="textSecondary" gutterBottom className={styles.trabajoUbicacion}>Categoria: {trabajo?.categoria}</Typography>
         <Typography variant="body2" color="textSecondary" gutterBottom className={styles.trabajoFechaLimite}>Fecha Límite: {trabajo?.fechaLimite}</Typography>
         <FormControl fullWidth margin="dense">
           <InputLabel>Disponibilidad</InputLabel>

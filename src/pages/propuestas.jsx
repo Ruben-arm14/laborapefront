@@ -13,7 +13,7 @@ const Propuestas = () => {
   const [confirmationOpen, setConfirmationOpen] = useState(false);
   const [clienteInfo, setClienteInfo] = useState(null);
   const [currentPropuestaId, setCurrentPropuestaId] = useState(null);
-  const [filter, setFilter] = useState('Todos');
+  const [filter, setFilter] = useState('TODOS');
   const [page, setPage] = useState(1);
   const itemsPerPage = 5;
 
@@ -91,13 +91,13 @@ const Propuestas = () => {
   };
 
   const filteredPropuestas = propuestas.filter(propuesta => {
-    if (filter === 'Todos') {
+    if (filter === 'TODOS') {
       return propuesta.estado !== 'EN_PROCESO' && propuesta.estado !== 'TERMINADO';
     }
     return propuesta.estado === filter;
   });
 
-  const handleFilterChange = (event, newValue) => {
+  const handleFilterChange = (newValue) => {
     setFilter(newValue);
     setPage(1); // Reset page to 1 when filter changes
   };
@@ -114,14 +114,19 @@ const Propuestas = () => {
         {error && <Alert severity="error">{error}</Alert>}
         <Tabs
           value={filter}
-          onChange={handleFilterChange}
+          onChange={(event, newValue) => handleFilterChange(newValue)}
           className={styles.tabs}
           centered
         >
-          <Tab label={`Todos (${propuestas.filter(p => p.estado !== 'EN_PROCESO' && p.estado !== 'TERMINADO').length})`} value="Todos" />
-          <Tab label={`Pendiente (${getCountByState('PENDIENTE')})`} value="PENDIENTE" />
-          <Tab label={`Aceptado (${getCountByState('ACEPTADO')})`} value="ACEPTADO" />
-          <Tab label={`Rechazado (${getCountByState('RECHAZADO')})`} value="RECHAZADO" />
+          {getCountByState('PENDIENTE') > 0 && (
+            <Tab label={`PENDIENTE (${getCountByState('PENDIENTE')})`} value="PENDIENTE" />
+          )}
+          {getCountByState('ACEPTADO') > 0 && (
+            <Tab label={`ACEPTADO (${getCountByState('ACEPTADO')})`} value="ACEPTADO" />
+          )}
+          {getCountByState('RECHAZADO') > 0 && (
+            <Tab label={`RECHAZADO (${getCountByState('RECHAZADO')})`} value="RECHAZADO" />
+          )}
         </Tabs>
         <Box className={styles.propuestasWrapper}>
           <Snackbar
@@ -155,6 +160,7 @@ const Propuestas = () => {
                     <Typography variant="body2" className={styles.trabajoUbicacion}>Ubicación: {propuesta.trabajo.ubicacion}</Typography>
                     <Typography variant="body2" className={styles.trabajoPresupuesto}>Presupuesto: {propuesta.presupuesto}</Typography>
                     <Typography variant="body2" className={styles.trabajoDisponibilidad}>Disponibilidad: {propuesta.disponibilidad}</Typography>
+                    <Typography variant="body2" className={styles.trabajoCategoria}>Categoria: {propuesta.trabajo.categoria}</Typography>
                     <Typography variant="body2" className={styles.trabajoEstado}>Estado: {propuesta.estado}</Typography>
                     {propuesta.estado === 'ACEPTADO' ? (
                       <Button

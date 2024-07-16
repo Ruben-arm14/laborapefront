@@ -18,6 +18,7 @@ const LogoBarAdmin = () => {
       <div className={styles.logo}>
         <img
           src={`/imagenes/Labora.png`}
+          alt="LaboraPE Logo"
           className={styles.logoImage}
         />
       </div>
@@ -29,11 +30,10 @@ const LogoBarAdmin = () => {
         </ul>
       </nav>
       <div className={styles.userActions}>
-        <a href="#" onClick={handleLogout} className={styles.logoutButton}>Cerrar Sesión</a>
+        <button onClick={handleLogout} className={styles.logoutButton}>Cerrar Sesión</button>
       </div>
     </div>
   );
 };
 
 export default LogoBarAdmin;
-

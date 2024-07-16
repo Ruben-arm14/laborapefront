@@ -23,6 +23,32 @@
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Sombra sutil */
 }
 
+.categoryFilterContainer {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.categoryFilterButton {
+  background-color: #e0e0e0;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.3s ease;
+}
+
+.categoryFilterButton:hover {
+  background-color: #bdbdbd;
+}
+
+.categoryFilterButton.active {
+  background-color: #007bff;
+  color: white;
+}
+
 .propuestasWrapper {
   width: 100%;
   max-width: 1200px;
